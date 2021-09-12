@@ -1,0 +1,269 @@
+* {
+    margin: 0;
+}
+
+body {
+    background-color: #f1f1f1;
+}
+
+.container {
+    margin: 0 2%;
+}
+
+.head-container {
+    min-height: 50px;
+    display: flex;
+    margin: 20px 5px 15px 15px;
+}
+
+.head-left {
+    width: 35%;
+}
+
+.download-container {
+    width: 35%;
+    display: flex;
+    background-color: #ffdbb0;
+    height: 54px;
+    border: 3px solid #ffa34f;
+    border-radius: 15px;
+}
+
+.download-img {
+    width: 46px;
+    height: 46px;
+    margin: 4px;
+}
+
+.search {
+    width: 70%;
+    background-color: rgba(246,255,157,0);
+    border: none;
+    font-family: sans-serif;
+    font-size: 26px;
+}
+
+.head-center {
+    width: 27.5%;
+}
+
+.head-right {
+    width: 37.5%;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+}
+
+.authorisation {
+    font-size: 26px;
+    font-family: sans-serif;
+    width: 30%;
+    border: 3px solid #6893ff;
+    background-color: #c6d5ff;
+    border-radius: 15px;
+    padding: 5px;
+    text-align: center;
+    margin-right: 10px;
+    line-height: 42px;
+    min-width: 90px;
+}
+
+.user-photo {
+    height: 60px;
+    width: 60px;
+}
+
+.main-container {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.left-slider {
+    min-width: 100px;
+    margin: 15px;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.load-button {
+    
+}
+
+.load-label {
+    margin-bottom: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #4FD666;
+    display: flex;
+    font-family: sans-serif;
+    line-height: 28px;
+    transition: all 0.18s ease-in-out;
+    cursor: pointer;
+    background: linear-gradient(to top right, #3EC97A, #69EA49 20%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0)) top right/500% 500%;
+}
+
+.load-label:hover {
+    color: white;
+    background-position: bottom left;
+}
+
+.load-file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.my-files {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 10px;
+    font-family: sans-serif;
+    display: flex;
+}
+
+.current-files {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 10px;
+    font-family: sans-serif;
+    display: flex;
+}
+
+.delete-all {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 10px;
+    font-family: sans-serif;
+    display: flex;
+    transition: all 0.18s ease-in-out;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px solid #ff1722;
+    background: linear-gradient(to top right, #ff5700, #e01010 20%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0)) top right/500% 500%;
+}
+
+.delete-all:hover {
+    color: white;
+    background-position: bottom left;
+}
+
+.left-slider-font {
+    line-height: 28px;
+}
+
+.img-in-slider {
+    height: 28px;
+    width: 28px;
+}
+
+.memory {
+    margin-top: 5px;
+    font-family: sans-serif;
+    padding: 10px;
+    height: 200px;
+    background-color: #3cd951;
+    color: #ffffff;
+    border-radius: 15px;
+}
+
+.center {
+    margin: 15px;
+    width: 80%;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+.file-header {
+    display: flex;
+    padding: 10px;
+}
+
+.file-header-bold {
+    font-family: sans-serif;
+}
+
+.file-header-container {
+    width: 35%;
+}
+
+.empty {
+    width: 10%;
+}
+
+.sort-type {
+    width: 20%;
+    display: flex;
+    border-radius: 5px;
+    border: none;
+    transition: all 0.18s ease-in-out;
+    cursor: pointer;
+    background-color: rgba(255,23,34,0);
+}
+
+.sort-type:focus {
+    background-color: #c7c7c7;
+}
+
+.sort-type-icon1 {
+    width: 80%;
+    text-align: center;
+    line-height: 34px;
+    font-family: sans-serif;
+    font-size: 18px;
+}
+
+.sort-type-icon2 {
+    width: 20%;
+}
+
+.next-img {
+    width: 32px;
+    height: 32px;
+}
+
+.icons {
+    width: 25%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.icon-table {
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 41px;
+    height: 41px;
+}
+
+.icon-list {
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 41px;
+    height: 41px;
+}
+
+.file-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.file {
+    margin: 10px;
+    width: 80px;
+    height: 100px;
+}
+
+.file-img {
+    width: 80px;
+    height: 80px;
+}
+
+.file-name {
+    font-family: sans-serif;
+    height: 20px;
+    text-align: center;
+}

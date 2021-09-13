@@ -87,10 +87,6 @@ body {
     justify-content: space-evenly;
 }
 
-.load-button {
-    
-}
-
 .load-label {
     margin-bottom: 5px;
     padding: 10px;
@@ -227,7 +223,7 @@ body {
 }
 
 .icons {
-    width: 25%;
+    width: 35%;
     display: flex;
     justify-content: flex-end;
 }

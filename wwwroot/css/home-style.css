@@ -304,13 +304,15 @@ body {
 }
 
 .file {
-    transition: all 0.18s ease-in-out;
+    transition: background-color 0.18s ease-in-out;
     margin: 10px 5px;
     padding: 10px 5px 20px 5px;
     width: 80px;
     height: 110px;
     border-radius: 10px;
     cursor: pointer;
+    position: relative;
+    display: inline-block;
 }
 
 .file:hover {
@@ -326,4 +328,34 @@ body {
     font-family: sans-serif;
     height: 20px;
     text-align: center;
+}
+
+.dropdown-content {
+    opacity: 0;
+    transition-duration: 0.5s;
+    transition-property: opacity;
+    transition-timing-function: ease;
+    transition-delay: 0.7s;
+    position: absolute;
+    background-color: #f1f1f1;
+    width: 100px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content p {
+    transition: all 0.18s ease-in-out;
+    color: black;
+    padding: 12px 16px;
+    font-family: sans-serif;
+    text-align: center;
+    display: block;
+}
+
+.dropdown-content p:hover {
+    background-color: #ddd;
+}
+
+.file:hover .dropdown-content {
+    opacity: 1;
 }

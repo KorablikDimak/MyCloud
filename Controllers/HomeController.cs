@@ -49,5 +49,32 @@ namespace MyCloud.Controllers
 
             return fileInfoToSend;
         }
+
+        [RequestSizeLimit(1024 * 1024 * 1024)]
+        [HttpPost("GetFile")]
+        public VirtualFileResult GetVirtualFile([FromBody] string fileName)
+        {
+            string filepath = Path.Combine("~/data", fileName);
+            return File(filepath, "application/octet-stream", fileName);
+        }
+
+        [HttpDelete("DeleteOneFile")]
+        public IActionResult Index([FromBody] string fileName)
+        {
+            string filepath = Path.Combine("wwwroot\\data", fileName);
+            System.IO.File.Delete(filepath);
+            return Ok();
+        }
+
+        [HttpDelete("DeleteAllFiles")]
+        public IActionResult DeleteAllFiles()
+        {
+            var dirInfo = new DirectoryInfo("wwwroot\\data\\");
+            foreach (var file in dirInfo.GetFiles())
+            {
+                file.Delete();
+            }
+            return Ok();
+        }
     }
 }

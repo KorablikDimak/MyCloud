@@ -20,8 +20,9 @@ body {
     width: 35%;
 }
 
-.download-container {
+.search-container {
     width: 35%;
+    transition: all 0.18s ease-in-out;
     display: flex;
     background-color: #ffdbb0;
     height: 54px;
@@ -29,18 +30,26 @@ body {
     border-radius: 15px;
 }
 
-.download-img {
+.search-container:hover {
+    width: 100%;
+}
+
+.search-img {
     width: 46px;
     height: 46px;
     margin: 4px;
 }
 
 .search {
-    width: 70%;
+    width: 100%;
     background-color: rgba(246,255,157,0);
     border: none;
     font-family: sans-serif;
     font-size: 26px;
+}
+
+.search:focus {
+    outline-width: 0;
 }
 
 .head-center {
@@ -58,14 +67,20 @@ body {
     font-size: 26px;
     font-family: sans-serif;
     width: 30%;
-    border: 3px solid #6893ff;
-    background-color: #c6d5ff;
+    border: 3px solid #80a4ff;
+    background-color: #dce4ff;
     border-radius: 15px;
     padding: 5px;
     text-align: center;
     margin-right: 10px;
     line-height: 42px;
     min-width: 90px;
+    cursor: pointer;
+    transition: all 0.18s ease-in-out;
+}
+
+.authorisation:hover {
+    background-color: #b9caff;
 }
 
 .user-photo {
@@ -115,19 +130,33 @@ body {
 }
 
 .my-files {
+    border-radius: 10px;
+    transition: all 0.18s ease-in-out;
     margin-top: 5px;
     margin-bottom: 5px;
     padding: 10px;
+    cursor: pointer;
     font-family: sans-serif;
     display: flex;
 }
 
+.my-files:hover {
+    background-color: #e7e7e7;
+}
+
 .current-files {
+    border-radius: 10px;
+    transition: all 0.18s ease-in-out;
     margin-top: 5px;
     margin-bottom: 5px;
     padding: 10px;
+    cursor: pointer;
     font-family: sans-serif;
     display: flex;
+}
+
+.current-files:hover {
+    background-color: #e7e7e7;
 }
 
 .delete-all {
@@ -168,6 +197,7 @@ body {
 }
 
 .center {
+    box-shadow: 3px 3px 15px 6px #c4c4c4;
     margin: 15px;
     width: 80%;
     background-color: #ffffff;
@@ -180,11 +210,12 @@ body {
 }
 
 .file-header-bold {
+    line-height: 60px;
     font-family: sans-serif;
 }
 
 .file-header-container {
-    width: 35%;
+    width: 30%;
 }
 
 .empty {
@@ -192,34 +223,37 @@ body {
 }
 
 .sort-type {
-    width: 20%;
+    width: 25%;
     display: flex;
-    border-radius: 5px;
+    border-radius: 10px;
     border: none;
     transition: all 0.18s ease-in-out;
     cursor: pointer;
     background-color: rgba(255,23,34,0);
 }
 
-.sort-type:focus {
-    background-color: #c7c7c7;
+.sort-type:hover {
+    background-color: #e7e7e7; 
 }
 
 .sort-type-icon1 {
-    width: 80%;
     text-align: center;
-    line-height: 34px;
+    line-height: 60px;
     font-family: sans-serif;
-    font-size: 18px;
+    font-size: 20px;
+    margin: 0 auto;
 }
 
 .sort-type-icon2 {
-    width: 20%;
+    height: 60px;
+    width: 60px;
+    margin: 0 auto;
 }
 
 .next-img {
-    width: 32px;
-    height: 32px;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
 }
 
 .icons {
@@ -228,18 +262,40 @@ body {
     justify-content: flex-end;
 }
 
+.icon-table-container {
+    height: 60px;
+    width: 60px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.18s ease-in-out;
+}
+
+.icon-table-container:hover {
+    background-color: #e7e7e7;
+}
+
 .icon-table {
-    margin-left: 10px;
-    margin-right: 10px;
-    width: 41px;
-    height: 41px;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+}
+
+.icon-list-container {
+    border-radius: 5px;
+    height: 60px;
+    width: 60px;
+    cursor: pointer;
+    transition: all 0.18s ease-in-out;
+}
+
+.icon-list-container:hover {
+    background-color: #e7e7e7;
 }
 
 .icon-list {
-    margin-left: 10px;
-    margin-right: 10px;
-    width: 41px;
-    height: 41px;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
 }
 
 .file-container {
@@ -248,9 +304,17 @@ body {
 }
 
 .file {
+    transition: all 0.18s ease-in-out;
     margin: 10px;
+    padding: 10px 0;
     width: 80px;
     height: 100px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.file:hover {
+    background-color: #eaeaea;
 }
 
 .file-img {

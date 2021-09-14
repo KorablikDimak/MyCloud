@@ -305,10 +305,10 @@ body {
 
 .file {
     transition: all 0.18s ease-in-out;
-    margin: 10px;
-    padding: 10px 0;
+    margin: 10px 5px;
+    padding: 10px 5px 20px 5px;
     width: 80px;
-    height: 100px;
+    height: 110px;
     border-radius: 10px;
     cursor: pointer;
 }

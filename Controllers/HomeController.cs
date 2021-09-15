@@ -21,7 +21,8 @@ namespace MyCloud.Controllers
         {
             foreach (var file in files) 
             {
-                await using var stream = System.IO.File.Create($"wwwroot\\data\\{file.FileName}");
+                string untrustedFileName = Path.GetFileName(file.FileName);
+                await using var stream = System.IO.File.Create($"wwwroot\\data\\{untrustedFileName}");
                 await file.CopyToAsync(stream);
             }
 
@@ -59,7 +60,7 @@ namespace MyCloud.Controllers
         }
 
         [HttpDelete("DeleteOneFile")]
-        public IActionResult Index([FromBody] string fileName)
+        public IActionResult DeleteOneFile([FromBody] string fileName)
         {
             string filepath = Path.Combine("wwwroot\\data", fileName);
             System.IO.File.Delete(filepath);

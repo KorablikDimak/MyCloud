@@ -28,7 +28,7 @@
                     <div class="empty"></div>
                     Загрузить файл
                 </label>
-                <form id="load-file-form" method="post" asp-action="Index" asp-controller="Home" enctype="multipart/form-data">
+                <form onsubmit="FormSubmit(this);" id="load-file-form" method="post" asp-action="Index" asp-controller="Home" enctype="multipart/form-data">
                     <input type="file" id="load-file" name="files" class="load-file-input" multiple/>
                 </form>
                 <div class="my-files">

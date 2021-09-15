@@ -12,6 +12,17 @@ function initPage() {
     updateFileContainer();
 }
 
+async function FormSubmit(formToSend) {
+    const init = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        body: new FormData(formToSend)
+    }
+    await fetch(formToSend.action, init);
+}
+
 function clearFileContainer() {
     let fileContainer = document.getElementById("files");
     fileContainer.innerHTML = "";
@@ -28,6 +39,12 @@ async function loadInputChanged(loadInput, loadForm) {
         if (sizeOfFiles < 1024 * 1024 * 1024){
             loadForm.submit();
         }
+        else {
+            window.alert("Общий объем загружаемых файлов не должен превышать 1гб");
+        }
+    }
+    else {
+        window.alert("Нельзя отправлять более 10 файлов за раз");
     }
 }
 
@@ -110,23 +127,27 @@ async function loadFileByClick(name){
 }
 
 async function deleteOneFile(name) {
-    const init = {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(name)
+    if (confirm("Вы уверены, что хотите удалить файл?")){
+        const init = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(name)
+        }
+        await fetch("https://localhost:5001/DeleteOneFile", init);
+        clearFileContainer();
+        updateFileContainer();
     }
-    await fetch("https://localhost:5001/DeleteOneFile", init);
-    clearFileContainer();
-    updateFileContainer();
 }
 
 async function deleteAllFiles(){
-    const init = {
-        method: 'DELETE'
+    if (confirm("Вы уверены, что хотите удалить все файлы?")) {
+        const init = {
+            method: 'DELETE'
+        }
+        await fetch("https://localhost:5001/DeleteAllFiles", init);
+        clearFileContainer();
+        updateFileContainer();
     }
-    await fetch("https://localhost:5001/DeleteAllFiles", init);
-    clearFileContainer();
-    updateFileContainer();
 }

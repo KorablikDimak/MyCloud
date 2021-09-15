@@ -2,47 +2,69 @@ initPage();
 
 function initPage() {
     let loadInput = document.getElementById("load-file");
-    let loadForm = document.getElementById("load-file-form");
     let deleter = document.getElementById("delete-all-files")
+    let container = document.getElementById("container");
     
-    loadInput.addEventListener("change", ev => loadInputChanged(loadInput, loadForm));
+    loadInput.addEventListener("change", ev => loadInputChanged(loadInput));
     deleter.addEventListener("click", ev => deleteAllFiles())
+        
+    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        container.addEventListener(eventName, preventDefaults, false)
+    });
+
+    ;['dragenter', 'dragover'].forEach(eventName => {
+        container.addEventListener(eventName, highlight, false)
+    });
+    
+    ;['dragleave', 'drop'].forEach(eventName => {
+        container.addEventListener(eventName, unhighlight, false)
+    });
+
+    container.addEventListener('drop', handleDrop, false)
     
     updatePage().then();
 }
 
-async function updatePage() {
-    clearFileContainer();
-    updateFileContainer();
-    await showFreeMemory();
+function handleDrop(e) {
+    let dt = e.dataTransfer;
+    let files = dt.files;
+    ([...files]).forEach(uploadFile);
 }
 
-async function FormSubmit(formToSend) {
+function highlight(e) {}
+
+function unhighlight(e) {}
+
+function preventDefaults (e) {
+    e.preventDefault()
+    e.stopPropagation()
+}
+
+async function sendFile(formData){
     const init = {
         method: 'POST',
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        },
-        body: new FormData(formToSend)
+        body: formData
     }
-    await fetch(formToSend.action, init);
+    await fetch("https://localhost:5001/LoadFile", init);
 }
 
-function clearFileContainer() {
-    let fileContainer = document.getElementById("files");
-    fileContainer.innerHTML = "";
+async function uploadFile(file) {
+    let formData = new FormData();
+    formData.append('files', file);
+    await sendFile(formData);
+    await updatePage();
 }
 
-async function loadInputChanged(loadInput, loadForm) {
+async function loadInputChanged(loadInput) {
     if (loadInput.files.length <= 10){
         let sizeOfFiles = 0;
-
         for (let i = 0; i < loadInput.files.length; i++){
             sizeOfFiles += loadInput.files[i].size;
         }
-
         if (sizeOfFiles < 1024 * 1024 * 1024){
-            loadForm.submit();
+            for (let i = 0; i < loadInput.files.length; i++){
+                await uploadFile(loadInput.files[i]);
+            }
         }
         else {
             window.alert("Общий объем загружаемых файлов не должен превышать 1гб");
@@ -51,62 +73,6 @@ async function loadInputChanged(loadInput, loadForm) {
     else {
         window.alert("Нельзя отправлять более 10 файлов за раз");
     }
-}
-
-async function loadFileInfo() {
-    const init = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-    const response = await fetch("https://localhost:5001/GetFileInfo", init);
-    return await response.json();
-}
-
-function updateFileContainer() {
-    loadFileInfo().then((json) => {
-        let fileContainer = document.getElementById("files");
-        for (let i = 0; i < json.length; i++){
-            const name = json[i].name;
-            const typeOfFile = json[i].typeOfFile;
-
-            let file = document.createElement("div");
-
-            file.className = "file";
-            file.innerHTML =
-                `<div class=\"dropdown-content\">\n` +
-                `<p id=\"load-this-${name}\">Скачать</p>\n` +
-                `<p id=\"delete-this-${name}\">Удалить</p>\n` +
-                `</div>` +
-                `<img  alt=\"\" src=\"images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
-                `<div class=\"file-name\">${createCurrentFileName(name, typeOfFile)}</div>\n`;
-            fileContainer.append(file);
-
-            updateButtons(name);
-        }
-    });
-}
-
-function updateButtons(name) {
-    let loadButton = document.getElementById(`load-this-${name}`);
-    let deleteButton = document.getElementById(`delete-this-${name}`);
-    
-    loadButton.addEventListener("click", ev => loadFileByClick(name));
-    deleteButton.addEventListener("click", ev => deleteOneFile(name));
-}
-
-function createCurrentFileName(fileName, typeOfFile) {
-    if (fileName.length > 20){
-        let currentFileName = "";
-        
-        for (let i = 0; i < 15; i++){
-            currentFileName+= fileName[i];
-        }
-        currentFileName+= ".." + typeOfFile;
-        return currentFileName;
-    }
-    return fileName;
 }
 
 async function loadFileByClick(name){
@@ -155,17 +121,4 @@ async function deleteAllFiles(){
         
         updatePage().then();
     }
-}
-
-async function showFreeMemory() {
-    let freeSize = 10737418240 - await getMemorySize();
-    console.log(freeSize);
-}
-
-async function getMemorySize() {
-    const init = {
-        method: 'GET'
-    }
-    const response = await fetch("https://localhost:5001/GetMemorySize", init);
-    return await response.json();
 }

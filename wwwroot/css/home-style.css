@@ -141,7 +141,7 @@ body {
 }
 
 .my-files:hover {
-    background-color: #e7e7e7;
+    background-color: #d6d6d6;
 }
 
 .current-files {
@@ -156,7 +156,7 @@ body {
 }
 
 .current-files:hover {
-    background-color: #e7e7e7;
+    background-color: #d6d6d6;
 }
 
 .delete-all {
@@ -188,12 +188,37 @@ body {
 
 .memory {
     margin-top: 5px;
-    font-family: sans-serif;
     padding: 10px;
     height: 200px;
     background-color: #3cd951;
-    color: #ffffff;
     border-radius: 15px;
+}
+
+.memory-text {
+    color: #ffffff;
+    font-family: sans-serif;
+    margin-bottom: 10px;
+}
+
+.memory-text-percent {
+    font-family: sans-serif;
+    text-align: center;
+    color: #000000;
+    line-height: 26px;
+    margin: 0 auto;
+}
+
+.memory-indicator {
+    height: 26px;
+    border: 2px solid #115f00;
+    background-color: #ffffff;
+    margin: 20px 10px;
+    border-radius: 20px;
+}
+
+.memory-bar {
+    height: 100%;
+    border-radius: 20px;
 }
 
 .center {

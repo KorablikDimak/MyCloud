@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="css/home-style.css"/>
     </head>
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <div class="head-container">
             <div class="head-left">
                 <label class="search-container" for="search-input">
@@ -28,9 +28,7 @@
                     <div class="empty"></div>
                     Загрузить файл
                 </label>
-                <form onsubmit="FormSubmit(this);" id="load-file-form" method="post" asp-action="Index" asp-controller="Home" enctype="multipart/form-data">
-                    <input type="file" id="load-file" name="files" class="load-file-input" multiple/>
-                </form>
+                <input type="file" id="load-file" name="files" class="load-file-input" multiple/>
                 <div class="my-files">
                     <img alt="" src="images/free-icon-folder-149334.png" class="img-in-slider"/>
                     <div class="empty"></div>
@@ -46,7 +44,14 @@
                     <div class="empty"></div>
                     <p class="left-slider-font">Удалить всё</p>
                 </div>
-                <div class="memory">Свободное место на диске:</div>
+                <div class="memory">
+                    <p class="memory-text">Свободное место на диске:</p>
+                    <p class="memory-text" id="free-size-of-memory"></p>
+                    <p class="memory-text">Заполнено:</p>
+                    <div class="memory-indicator" id="memory-indicator">
+                        <div class="memory-bar" id="memory-bar"></div>
+                    </div>
+                </div>
             </div>
             <div class="center">
                 <div class="file-header">
@@ -73,6 +78,8 @@
             </div>
         </div>
     </div>
+    <script src="js/updatePage.js"></script>
+    <script src="js/gradientFunction.js"></script>
     <script src="js/loadFiles.js"></script>
 </body>
 </html>

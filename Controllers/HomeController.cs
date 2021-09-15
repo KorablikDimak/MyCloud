@@ -17,8 +17,8 @@ namespace MyCloud.Controllers
         }
 
         [RequestSizeLimit(1024 * 1024 * 1024)]
-        [HttpPost]
-        public async Task<IActionResult> Index(ICollection<IFormFile> files)
+        [HttpPost("LoadFile")]
+        public async Task<IActionResult> LoadFile(ICollection<IFormFile> files)
         {
             foreach (var file in files) 
             {
@@ -27,7 +27,7 @@ namespace MyCloud.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            return View();
+            return Ok();
         }
 
         [HttpGet("GetFileInfo")]

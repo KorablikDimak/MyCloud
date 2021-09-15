@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -75,7 +76,15 @@ namespace MyCloud.Controllers
             {
                 file.Delete();
             }
+
             return Ok();
+        }
+
+        [HttpGet("GetMemorySize")]
+        public long GetMemorySize()
+        {
+            var dirInfo = new DirectoryInfo("wwwroot\\data\\");
+            return dirInfo.GetFiles().Sum(file => file.Length);
         }
     }
 }

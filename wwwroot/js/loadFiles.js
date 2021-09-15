@@ -8,8 +8,13 @@ function initPage() {
     loadInput.addEventListener("change", ev => loadInputChanged(loadInput, loadForm));
     deleter.addEventListener("click", ev => deleteAllFiles())
     
+    updatePage().then();
+}
+
+async function updatePage() {
     clearFileContainer();
     updateFileContainer();
+    await showFreeMemory();
 }
 
 async function FormSubmit(formToSend) {
@@ -122,8 +127,8 @@ async function loadFileByClick(name){
     dummy.download = name;
     document.body.appendChild(dummy);
     dummy.click();
-    clearFileContainer();
-    updateFileContainer();
+    
+    updatePage().then();
 }
 
 async function deleteOneFile(name) {
@@ -136,8 +141,8 @@ async function deleteOneFile(name) {
             body: JSON.stringify(name)
         }
         await fetch("https://localhost:5001/DeleteOneFile", init);
-        clearFileContainer();
-        updateFileContainer();
+        
+        updatePage().then();
     }
 }
 
@@ -147,7 +152,20 @@ async function deleteAllFiles(){
             method: 'DELETE'
         }
         await fetch("https://localhost:5001/DeleteAllFiles", init);
-        clearFileContainer();
-        updateFileContainer();
+        
+        updatePage().then();
     }
+}
+
+async function showFreeMemory() {
+    let freeSize = 10737418240 - await getMemorySize();
+    console.log(freeSize);
+}
+
+async function getMemorySize() {
+    const init = {
+        method: 'GET'
+    }
+    const response = await fetch("https://localhost:5001/GetMemorySize", init);
+    return await response.json();
 }

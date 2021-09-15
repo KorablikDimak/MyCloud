@@ -1,45 +1,3 @@
-initPage();
-
-function initPage() {
-    let loadInput = document.getElementById("load-file");
-    let deleter = document.getElementById("delete-all-files")
-    let container = document.getElementById("container");
-    
-    loadInput.addEventListener("change", ev => loadInputChanged(loadInput));
-    deleter.addEventListener("click", ev => deleteAllFiles())
-        
-    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        container.addEventListener(eventName, preventDefaults, false)
-    });
-
-    ;['dragenter', 'dragover'].forEach(eventName => {
-        container.addEventListener(eventName, highlight, false)
-    });
-    
-    ;['dragleave', 'drop'].forEach(eventName => {
-        container.addEventListener(eventName, unhighlight, false)
-    });
-
-    container.addEventListener('drop', handleDrop, false)
-    
-    updatePage().then();
-}
-
-function handleDrop(e) {
-    let dt = e.dataTransfer;
-    let files = dt.files;
-    ([...files]).forEach(uploadFile);
-}
-
-function highlight(e) {}
-
-function unhighlight(e) {}
-
-function preventDefaults (e) {
-    e.preventDefault()
-    e.stopPropagation()
-}
-
 async function sendFile(formData){
     const init = {
         method: 'POST',
@@ -55,23 +13,23 @@ async function uploadFile(file) {
     await updatePage();
 }
 
-async function loadInputChanged(loadInput) {
-    if (loadInput.files.length <= 10){
-        let sizeOfFiles = 0;
-        for (let i = 0; i < loadInput.files.length; i++){
-            sizeOfFiles += loadInput.files[i].size;
-        }
-        if (sizeOfFiles < 1024 * 1024 * 1024){
+async function loadInputChanged(loadInput){
+    let sizeOfFiles = 0;
+    for (let i = 0; i < loadInput.files.length; i++){
+        sizeOfFiles += loadInput.files[i].size;
+    }
+    if (sizeOfFiles < 1073741824){
+        if (10737418240 - await getMemorySize() >= sizeOfFiles){
             for (let i = 0; i < loadInput.files.length; i++){
                 await uploadFile(loadInput.files[i]);
             }
         }
         else {
-            window.alert("Общий объем загружаемых файлов не должен превышать 1гб");
+            window.alert("Объем файлов превышает свободное место на диске");
         }
-    }
+    } 
     else {
-        window.alert("Нельзя отправлять более 10 файлов за раз");
+        window.alert("Общий объем загружаемых файлов не должен превышать 1гб");
     }
 }
 

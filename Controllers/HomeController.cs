@@ -10,13 +10,15 @@ namespace MyCloud.Controllers
 {
     public class HomeController : Controller
     {
+        private const long MaxMemorySize = 10737418240;
+            
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        [RequestSizeLimit(1024 * 1024 * 1024)]
+        [RequestSizeLimit(1073741824)]
         [HttpPost("LoadFile")]
         public async Task<IActionResult> LoadFile(ICollection<IFormFile> files)
         {
@@ -24,10 +26,17 @@ namespace MyCloud.Controllers
             {
                 string untrustedFileName = Path.GetFileName(file.FileName);
                 await using var stream = System.IO.File.Create($"wwwroot\\data\\{untrustedFileName}");
+                if (!IsMemoryFree(stream.Length)) return new ConflictResult();
                 await file.CopyToAsync(stream);
             }
 
             return Ok();
+        }
+
+        private static bool IsMemoryFree(long fileSize)
+        {
+            var dirInfo = new DirectoryInfo("wwwroot\\data\\");
+            return dirInfo.GetFiles().Sum(file => file.Length) + fileSize <= MaxMemorySize;
         }
 
         [HttpGet("GetFileInfo")]
@@ -52,7 +61,7 @@ namespace MyCloud.Controllers
             return fileInfoToSend;
         }
 
-        [RequestSizeLimit(1024 * 1024 * 1024)]
+        [RequestSizeLimit(1073741824)]
         [HttpPost("GetFile")]
         public VirtualFileResult GetVirtualFile([FromBody] string fileName)
         {

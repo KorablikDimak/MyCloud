@@ -60,6 +60,10 @@ function createCurrentFileName(fileName, typeOfFile) {
             currentFileName+= fileName[i];
         }
         currentFileName+= ".." + typeOfFile;
+        
+        if (currentFileName.length > 12){
+            currentFileName = currentFileName.slice(0, 11) + "\n" + currentFileName.slice(11, currentFileName.length - 1);
+        }
         return currentFileName;
     }
     return fileName;

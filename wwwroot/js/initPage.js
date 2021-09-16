@@ -13,6 +13,12 @@ function initPage(){
         document.getElementById("datetime"), 
         document.getElementById("size")];
     
+    document.getElementById("chosen-name").style.backgroundColor = "#404040";
+    document.getElementById("chosen-ASC").style.backgroundColor = "#404040";
+    
+    let sortOption = document.querySelectorAll(".dropdown-line");
+    sortOption.forEach(sortOptionClicked);
+    
     let ASC = document.getElementById("ASC");
     let DESC = document.getElementById("DESC");
 
@@ -42,18 +48,29 @@ function initPage(){
     }
 
     ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        container.addEventListener(eventName, preventDefaults, false)
+        container.addEventListener(eventName, preventDefaults, false);
     });
 
     ;['dragenter', 'dragover'].forEach(eventName => {
-        container.addEventListener(eventName, ev => highlight(container), false)
+        container.addEventListener(eventName, ev => highlight(container), false);
     });
 
     ;['dragleave', 'drop'].forEach(eventName => {
-        container.addEventListener(eventName, ev => unhighlight(container), false)
+        container.addEventListener(eventName, ev => unhighlight(container), false);
     });
 
-    container.addEventListener('drop', handleDrop, false)
-
+    container.addEventListener('drop', handleDrop, false);
+    
     updatePage().then();
+}
+
+function sortOptionClicked(dropDownLine) {
+    dropDownLine.addEventListener("click", ev => {
+        let otherChosen = document.querySelectorAll(`.${dropDownLine.classList[1].toString()}` + " > .chosen");
+        otherChosen.forEach(function (other) {
+            other.style.backgroundColor = "rgba(56,56,56,0)";
+        });
+        let chosen = dropDownLine.querySelector(".chosen");
+        chosen.style.backgroundColor = "#404040";
+    });
 }

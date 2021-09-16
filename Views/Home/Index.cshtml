@@ -63,15 +63,39 @@
                         <h1 class="file-header-bold">Файлы</h1>
                     </div>
                     <div class="empty"></div>
-                    <div class="sort-type">
+                    <div class="sort-type" id="sort-type-button">
                         <div class="dropdown-content" id="dropdown-content-sort">
-                            <p id="name">По имени</p>
-                            <p id="typeoffile">По типу</p>
-                            <p id="datetime">По времени</p>
-                            <p id="size">По размеру</p>
+                            <div class="dropdown-line dropdown-line-order">
+                                <p id="name">По имени</p>
+                                <div class="vertical-line"></div>
+                                <div class="chosen" id="chosen-name"></div>
+                            </div>
+                            <div class="dropdown-line dropdown-line-order">
+                                <p id="typeoffile">По типу</p>
+                                <div class="vertical-line"></div>
+                                <div class="chosen" id="chosen-typeoffile"></div>
+                            </div>
+                            <div class="dropdown-line dropdown-line-order">
+                                <p id="datetime">По времени</p>
+                                <div class="vertical-line"></div>
+                                <div class="chosen" id="chosen-datetime"></div>
+                            </div>
+                            <div class="dropdown-line dropdown-line-order">
+                                <p id="size">По размеру</p>
+                                <div class="vertical-line"></div>
+                                <div class="chosen" id="chosen-size"></div>
+                            </div>
                             <hr/>
-                            <p id="ASC">По убыванию</p>
-                            <p id="DESC">По возрастанию</p>
+                            <div class="dropdown-line dropdown-line-sort">
+                                <p id="ASC">По убыванию</p>
+                                <div class="vertical-line"></div>
+                                <div class="chosen" id="chosen-ASC"></div>
+                            </div>
+                            <div class="dropdown-line dropdown-line-sort">
+                                <p id="DESC">По возрастанию</p>
+                                <div class="vertical-line"></div>
+                                <div class="chosen" id="chosen-DESC"></div>
+                            </div>
                         </div>
                         <div class="sort-type-icon1" id="current-sort-type">По имени</div>
                         <div class="sort-type-icon2" >

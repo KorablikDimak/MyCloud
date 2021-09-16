@@ -30,11 +30,11 @@ namespace MyCloud.Controllers
                 var untrustedFileName = Path.GetFileName(file.FileName);
                 var filePath = $"wwwroot\\data\\{untrustedFileName}";
                 await using var stream = System.IO.File.Create(filePath);
-                if (!IsMemoryFree(stream.Length)) return new ConflictResult();
+                if (!IsMemoryFree(file.Length)) return new ConflictResult();
                 
                 var fileInfo = new FileInfo(filePath);
-                var myFileInfo = new MyFileInfo(fileInfo.Name, fileInfo.Extension, fileInfo.CreationTime, stream.Length);
-                
+                var myFileInfo = new MyFileInfo(fileInfo.Name, fileInfo.Extension, fileInfo.CreationTime, file.Length);
+
                 if (await LoadFileInfoToDataBaseAsync(myFileInfo))
                 {
                     await file.CopyToAsync(stream);

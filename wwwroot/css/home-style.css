@@ -30,12 +30,13 @@ body {
     justify-content: center;
     flex-direction: column;
     opacity: 0;
-    z-index: 1;
+    z-index: -10;
     transition: all 0.3s ease-in-out;
 }
 
 .container.highlight .drop-message {
     opacity: 1;
+    z-index: 5;
 }
 
 .drop-message-img {
@@ -250,6 +251,7 @@ body {
 }
 
 .memory-indicator {
+    overflow: hidden;
     height: 26px;
     border: 2px solid #115f00;
     background-color: #ffffff;
@@ -304,6 +306,7 @@ body {
 
 .sort-type:hover .dropdown-content {
     opacity: 1;
+    z-index: 10;
 }
 
 .sort-type-icon1 {
@@ -366,6 +369,12 @@ body {
     padding: 10px;
     width: 40px;
     height: 40px;
+}
+
+.file-container-slide {
+    height: 380px;
+    width: 100%;
+    overflow: auto;
 }
 
 .file-container {

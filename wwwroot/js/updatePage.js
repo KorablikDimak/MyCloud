@@ -62,19 +62,21 @@ function updateButtons(name){
 }
 
 function createCurrentFileName(fileName, typeOfFile){
+    
     if (fileName.length > 20){
         let currentFileName = "";
 
         for (let i = 0; i < 15; i++){
             currentFileName+= fileName[i];
         }
-        currentFileName+= ".." + typeOfFile;
+        currentFileName += ".." + typeOfFile;
         
-        if (currentFileName.length > 12){
-            currentFileName = currentFileName.slice(0, 11) + "\n" + currentFileName.slice(11, currentFileName.length - 1);
-        }
-        return currentFileName;
+        fileName = currentFileName;
     }
+    if (fileName.length > 12){
+        fileName = fileName.slice(0, 11) + "\n" + fileName.slice(11, fileName.length - 1);
+    }
+    
     return fileName;
 }
 
@@ -93,8 +95,8 @@ function updateMemoryIndicator(freeSize){
     let percent = 100 - (100 * freeSize / 10240);
     let memoryBar = document.getElementById("memory-bar");
     memoryBar.style.width = (percent) + "%";
-    memoryBar.style.backgroundColor = getGradientColor("#5bff76", "#ff1c1c", percent)
-    memoryBar.innerHTML = `<p class=\"memory-text-percent\">${percent}%</p>`;
+    memoryBar.style.backgroundColor = getGradientColor("#5bff76", "#ff1c1c", percent);
+    memoryBar.innerHTML = `<p class=\"memory-text-percent\">${percent.toFixed(2)}%</p>`;
 }
 
 async function getMemorySize(){

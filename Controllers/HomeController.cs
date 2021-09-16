@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyCloud.Models.MyFile;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
 
 namespace MyCloud.Controllers
 {
@@ -58,9 +57,8 @@ namespace MyCloud.Controllers
             {
                 try
                 {
-                    var sqlDateTime = new SqlDateTime(fileInfo.DateTimeUpload);
                     var commandText = "INSERT INTO Files (name, typeoffile, datetime, size) VALUES " +
-                                      $"(N'{fileInfo.Name}', N'{fileInfo.TypeOfFile}', '{sqlDateTime}', {fileInfo.Size})";
+                                      $"(N'{fileInfo.Name}', N'{fileInfo.TypeOfFile}', '{fileInfo.DateTimeUpload}', {fileInfo.Size})";
                     await connection.OpenAsync();
                     var command = new SqlCommand(commandText, connection);
                     await command.ExecuteNonQueryAsync();
@@ -92,13 +90,18 @@ namespace MyCloud.Controllers
             {
                 try
                 {
-                    var commandText = $"SELECT name, typeoffile FROM Files ORDER BY {sortType.OrderBy} {sortType.TypeOfSort}";
+                    var commandText = $"SELECT * FROM Files ORDER BY {sortType.OrderBy} {sortType.TypeOfSort}";
                     await connection.OpenAsync();
                     var command = new SqlCommand(commandText, connection);
                     var reader = await command.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
-                        var fileInfo = new MyFileInfo(reader.GetString(0), reader.GetString(1), new DateTime(), new long());
+                        var fileInfo = new MyFileInfo(
+                            reader.GetInt32(0), 
+                            reader.GetString(1), 
+                            reader.GetString(2), 
+                            reader.GetSqlDateTime(3), 
+                            reader.GetInt64(4));
                         fileInfoToSend.Add(fileInfo);
                     }
                 }

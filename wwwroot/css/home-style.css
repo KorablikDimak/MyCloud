@@ -302,6 +302,10 @@ body {
     background-color: #e7e7e7; 
 }
 
+.sort-type:hover .dropdown-content {
+    opacity: 1;
+}
+
 .sort-type-icon1 {
     text-align: center;
     line-height: 60px;
@@ -409,6 +413,12 @@ body {
     z-index: 1;
 }
 
+#dropdown-content-sort {
+    transition-duration: 0.3s;
+    transition-delay: 0s;
+    width: 180px;
+}
+
 .dropdown-content p {
     transition: all 0.18s ease-in-out;
     color: black;
@@ -416,6 +426,10 @@ body {
     font-family: sans-serif;
     text-align: center;
     display: block;
+}
+
+#dropdown-content-sort p {
+    font-size: 16px;
 }
 
 .dropdown-content p:hover {

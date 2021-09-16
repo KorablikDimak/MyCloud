@@ -1,4 +1,4 @@
-function getGradientColor(startColor, endColor, percent) {
+function getGradientColor(startColor, endColor, percent){
     // strip the leading # if it's there
     percent /= 100;
     startColor = startColor.replace(/^\s*#|\s*$/g, '');

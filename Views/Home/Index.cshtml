@@ -8,10 +8,10 @@
     </head>
 <body>
     <div class="container" id="container">
-        <div class="drop-message">
+        <!--<div class="drop-message">
             <img class="drop-message-img" src="images/free-icon-download-126488.png" alt=""/>
             <p class="drop-message-text">Перетащите файл сюда чтобы загрузить его</p>
-        </div>
+        </div>-->
         <div class="head-container">
             <div class="head-left">
                 <label class="search-container" for="search-input">
@@ -64,10 +64,19 @@
                     </div>
                     <div class="empty"></div>
                     <div class="sort-type">
-                        <span class="sort-type-icon1">По названию</span>
-                        <span class="sort-type-icon2">
-                            <img src="images/free-icon-down-arrow-134210.png" alt="" class="next-img"/>
-                        </span>
+                        <div class="dropdown-content" id="dropdown-content-sort">
+                            <p id="name">По имени</p>
+                            <p id="typeoffile">По типу</p>
+                            <p id="datetime">По времени</p>
+                            <p id="size">По размеру</p>
+                            <hr/>
+                            <p id="ASC">По убыванию</p>
+                            <p id="DESC">По возрастанию</p>
+                        </div>
+                        <div class="sort-type-icon1" id="current-sort-type">По имени</div>
+                        <div class="sort-type-icon2" >
+                            <img src="images/free-icon-down-arrow-134210.png" alt="" class="next-img" id="arrow"/>
+                        </div>
                     </div>
                     <div class="icons">
                         <div class="icon-table-container">

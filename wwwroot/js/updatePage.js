@@ -1,26 +1,35 @@
-async function updatePage() {
+async function updatePage(){
     clearFileContainer();
     updateFileContainer();
     await showFreeMemory();
 }
 
-function clearFileContainer() {
+function clearFileContainer(){
     let fileContainer = document.getElementById("files");
     fileContainer.innerHTML = "";
 }
 
-async function loadFileInfo() {
+let fileInfoBody = {
+    orderBy: "name",
+    typeOfSort: "ASC"
+}
+
+async function loadFileInfo(){
     const init = {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+            orderBy: fileInfoBody.orderBy,
+            typeOfSort: fileInfoBody.typeOfSort
+        })
     }
     const response = await fetch("https://localhost:5001/GetFileInfo", init);
     return await response.json();
 }
 
-function updateFileContainer() {
+function updateFileContainer(){
     loadFileInfo().then((json) => {
         let fileContainer = document.getElementById("files");
         for (let i = 0; i < json.length; i++){
@@ -44,7 +53,7 @@ function updateFileContainer() {
     });
 }
 
-function updateButtons(name) {
+function updateButtons(name){
     let loadButton = document.getElementById(`load-this-${name}`);
     let deleteButton = document.getElementById(`delete-this-${name}`);
 
@@ -52,7 +61,7 @@ function updateButtons(name) {
     deleteButton.addEventListener("click", ev => deleteOneFile(name));
 }
 
-function createCurrentFileName(fileName, typeOfFile) {
+function createCurrentFileName(fileName, typeOfFile){
     if (fileName.length > 20){
         let currentFileName = "";
 
@@ -69,18 +78,18 @@ function createCurrentFileName(fileName, typeOfFile) {
     return fileName;
 }
 
-async function showFreeMemory() {
+async function showFreeMemory(){
     let freeSize = 10240 - Math.round((await getMemorySize()) / 1024 / 1024);
     updateMemoryText(freeSize);
     updateMemoryIndicator(freeSize);
 }
 
-function updateMemoryText(freeSize) {
+function updateMemoryText(freeSize){
     let memoryText = document.getElementById("free-size-of-memory");
     memoryText.innerText = `доступно ${freeSize} Мбайт из ${10240}`;
 }
 
-function updateMemoryIndicator(freeSize) {
+function updateMemoryIndicator(freeSize){
     let percent = 100 - (100 * freeSize / 10240);
     let memoryBar = document.getElementById("memory-bar");
     memoryBar.style.width = (percent) + "%";
@@ -88,7 +97,7 @@ function updateMemoryIndicator(freeSize) {
     memoryBar.innerHTML = `<p class=\"memory-text-percent\">${percent}%</p>`;
 }
 
-async function getMemorySize() {
+async function getMemorySize(){
     const init = {
         method: 'GET'
     }

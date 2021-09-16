@@ -6,7 +6,7 @@ async function sendFile(formData){
     await fetch("https://localhost:5001/LoadFile", init);
 }
 
-async function uploadFile(file) {
+async function uploadFile(file){
     let formData = new FormData();
     formData.append('files', file);
     await sendFile(formData);
@@ -55,7 +55,7 @@ async function loadFileByClick(name){
     updatePage().then();
 }
 
-async function deleteOneFile(name) {
+async function deleteOneFile(name){
     if (confirm("Вы уверены, что хотите удалить файл?")){
         const init = {
             method: 'DELETE',
@@ -71,7 +71,7 @@ async function deleteOneFile(name) {
 }
 
 async function deleteAllFiles(){
-    if (confirm("Вы уверены, что хотите удалить все файлы?")) {
+    if (confirm("Вы уверены, что хотите удалить все файлы?")){
         const init = {
             method: 'DELETE'
         }

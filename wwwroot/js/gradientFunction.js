@@ -1,15 +1,15 @@
-function getGradientColor(startColor, endColor, percent){
+function getGradientColor(startColor, endColor, percent) {
     // strip the leading # if it's there
     percent /= 100;
     startColor = startColor.replace(/^\s*#|\s*$/g, '');
     endColor = endColor.replace(/^\s*#|\s*$/g, '');
 
     // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
-    if(startColor.length == 3){
+    if(startColor.length == 3) {
         startColor = startColor.replace(/(.)/g, '$1$1');
     }
 
-    if(endColor.length == 3){
+    if(endColor.length == 3) {
         endColor = endColor.replace(/(.)/g, '$1$1');
     }
 

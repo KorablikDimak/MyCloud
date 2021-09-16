@@ -1,4 +1,4 @@
-async function sendFile(formData){
+async function sendFile(formData) {
     const init = {
         method: 'POST',
         body: formData
@@ -6,21 +6,21 @@ async function sendFile(formData){
     await fetch("https://localhost:5001/LoadFile", init);
 }
 
-async function uploadFile(file){
+async function uploadFile(file) {
     let formData = new FormData();
     formData.append('files', file);
     await sendFile(formData);
     await updatePage();
 }
 
-async function loadInputChanged(loadInput){
+async function loadInputChanged(loadInput) {
     let sizeOfFiles = 0;
-    for (let i = 0; i < loadInput.files.length; i++){
+    for (let i = 0; i < loadInput.files.length; i++) {
         sizeOfFiles += loadInput.files[i].size;
     }
     if (sizeOfFiles < 1073741824){
-        if (10737418240 - await getMemorySize() >= sizeOfFiles){
-            for (let i = 0; i < loadInput.files.length; i++){
+        if (10737418240 - await getMemorySize() >= sizeOfFiles) {
+            for (let i = 0; i < loadInput.files.length; i++) {
                 await uploadFile(loadInput.files[i]);
             }
         }
@@ -33,7 +33,7 @@ async function loadInputChanged(loadInput){
     }
 }
 
-async function loadFileByClick(name){
+async function loadFileByClick(name) {
     const init = {
         method: 'POST',
         headers: {
@@ -55,8 +55,8 @@ async function loadFileByClick(name){
     updatePage().then();
 }
 
-async function deleteOneFile(name){
-    if (confirm("Вы уверены, что хотите удалить файл?")){
+async function deleteOneFile(name) {
+    if (confirm("Вы уверены, что хотите удалить файл?")) {
         const init = {
             method: 'DELETE',
             headers: {
@@ -70,8 +70,8 @@ async function deleteOneFile(name){
     }
 }
 
-async function deleteAllFiles(){
-    if (confirm("Вы уверены, что хотите удалить все файлы?")){
+async function deleteAllFiles() {
+    if (confirm("Вы уверены, что хотите удалить все файлы?")) {
         const init = {
             method: 'DELETE'
         }

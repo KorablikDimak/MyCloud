@@ -306,6 +306,7 @@ body {
 
 .sort-type:hover .dropdown-content {
     opacity: 1;
+    z-index: 2;
 }
 
 .dropdown-line {
@@ -346,10 +347,6 @@ body {
     transition: all 0.18s ease-in-out;
 }
 
-.icon-table-container:hover {
-    background-color: #e7e7e7;
-}
-
 .icon-table {
     padding: 10px;
     width: 40px;
@@ -362,10 +359,6 @@ body {
     width: 60px;
     cursor: pointer;
     transition: all 0.18s ease-in-out;
-}
-
-.icon-list-container:hover {
-    background-color: #e7e7e7;
 }
 
 .icon-list {
@@ -412,6 +405,19 @@ body {
     text-align: center;
 }
 
+.file-list {
+    padding: 3px;
+    margin: 2px 7px;
+    height: 32px;
+    width: 100%;
+}
+
+.file-list .file-name {
+    height: 100%;
+    line-height: 32px;
+    text-align: left;
+}
+
 .dropdown-content {
     opacity: 0;
     overflow: hidden;
@@ -424,7 +430,7 @@ body {
     border-radius: 10px;
     width: 100px;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index: -1;
 }
 
 #dropdown-content-sort {
@@ -466,4 +472,5 @@ body {
 
 .file:hover .dropdown-content {
     opacity: 1;
+    z-index: 5;
 }

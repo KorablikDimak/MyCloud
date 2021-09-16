@@ -1,20 +1,22 @@
-async function updatePage(){
-    clearFileContainer();
-    updateFileContainer();
-    await showFreeMemory();
-}
-
-function clearFileContainer(){
-    let fileContainer = document.getElementById("files");
-    fileContainer.innerHTML = "";
-}
-
 let fileInfoBody = {
     orderBy: "name",
     typeOfSort: "ASC"
 }
 
-async function loadFileInfo(){
+let showType = showFileTable;
+
+async function updatePage() {
+    clearFileContainer();
+    await updateFileContainer();
+    await showFreeMemory();
+}
+
+function clearFileContainer() {
+    let fileContainer = document.getElementById("files");
+    fileContainer.innerHTML = "";
+}
+
+async function loadFileInfo() {
     const init = {
         method: 'POST',
         headers: {
@@ -29,31 +31,46 @@ async function loadFileInfo(){
     return await response.json();
 }
 
-function updateFileContainer(){
-    loadFileInfo().then((json) => {
-        let fileContainer = document.getElementById("files");
-        for (let i = 0; i < json.length; i++){
-            const name = json[i].name;
-            const typeOfFile = json[i].typeOfFile;
-
-            let file = document.createElement("div");
-
-            file.className = "file";
-            file.innerHTML =
-                `<div class=\"dropdown-content\">\n` +
-                `<p id=\"load-this-${name}\">Скачать</p>\n` +
-                `<p id=\"delete-this-${name}\">Удалить</p>\n` +
-                `</div>` +
-                `<img  alt=\"\" src=\"images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
-                `<div class=\"file-name\">${createCurrentFileName(name, typeOfFile)}</div>\n`;
-            fileContainer.append(file);
-
-            updateButtons(name);
-        }
-    });
+async function updateFileContainer() {
+    let json = await loadFileInfo();
+    pullFileContainer(json);
 }
 
-function updateButtons(name){
+function pullFileContainer(json) {
+    let fileContainer = document.getElementById("files");
+    for (let i = 0; i < json.length; i++) {
+        const name = json[i].name;
+        const typeOfFile = json[i].typeOfFile;
+        fileContainer.append(showType(name, typeOfFile));
+        updateButtons(name);
+    }
+}
+
+function showFileList(name, typeOfFile) {
+    let file = document.createElement("div");
+    file.className = "file";
+    file.classList.add("file-list")
+    file.innerHTML = `<div class=\"dropdown-content\">\n` +
+        `<p id=\"load-this-${name}\">Скачать</p>\n` +
+        `<p id=\"delete-this-${name}\">Удалить</p>\n` +
+        `</div>` +
+        `<div class=\"file-name\">${name}</div>\n`;
+    return file;
+}
+
+function showFileTable(name, typeOfFile) {
+    let file = document.createElement("div");
+    file.className = "file";
+    file.innerHTML = `<div class=\"dropdown-content\">\n` +
+        `<p id=\"load-this-${name}\">Скачать</p>\n` +
+        `<p id=\"delete-this-${name}\">Удалить</p>\n` +
+        `</div>` +
+        `<img  alt=\"\" src=\"images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
+        `<div class=\"file-name\">${createCurrentFileName(name, typeOfFile)}</div>\n`;
+    return file;
+}
+
+function updateButtons(name) {
     let loadButton = document.getElementById(`load-this-${name}`);
     let deleteButton = document.getElementById(`delete-this-${name}`);
 
@@ -61,13 +78,13 @@ function updateButtons(name){
     deleteButton.addEventListener("click", ev => deleteOneFile(name));
 }
 
-function createCurrentFileName(fileName, typeOfFile){
+function createCurrentFileName(fileName, typeOfFile) {
     
     if (fileName.length > 20){
         let currentFileName = "";
 
-        for (let i = 0; i < 15; i++){
-            currentFileName+= fileName[i];
+        for (let i = 0; i < 20 - typeOfFile.length; i++){
+            currentFileName += fileName[i];
         }
         currentFileName += ".." + typeOfFile;
         
@@ -80,18 +97,18 @@ function createCurrentFileName(fileName, typeOfFile){
     return fileName;
 }
 
-async function showFreeMemory(){
+async function showFreeMemory() {
     let freeSize = 10240 - Math.round((await getMemorySize()) / 1024 / 1024);
     updateMemoryText(freeSize);
     updateMemoryIndicator(freeSize);
 }
 
-function updateMemoryText(freeSize){
+function updateMemoryText(freeSize) {
     let memoryText = document.getElementById("free-size-of-memory");
     memoryText.innerText = `доступно ${freeSize} Мбайт из ${10240}`;
 }
 
-function updateMemoryIndicator(freeSize){
+function updateMemoryIndicator(freeSize) {
     let percent = 100 - (100 * freeSize / 10240);
     let memoryBar = document.getElementById("memory-bar");
     memoryBar.style.width = (percent) + "%";
@@ -99,7 +116,7 @@ function updateMemoryIndicator(freeSize){
     memoryBar.innerHTML = `<p class=\"memory-text-percent\">${percent.toFixed(2)}%</p>`;
 }
 
-async function getMemorySize(){
+async function getMemorySize() {
     const init = {
         method: 'GET'
     }

@@ -16,7 +16,7 @@ namespace MyCloud.Controllers
         private const string Connect = "Data Source=LAPTOP-KPPKGVU7\\LOVE;Initial Catalog=MyCloud;Persist Security Info=True;User ID=root;Password=Faggot_2002";
             
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult MyFiles()
         {
             return View();
         }

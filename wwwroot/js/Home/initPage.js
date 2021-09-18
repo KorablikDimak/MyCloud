@@ -98,13 +98,13 @@ function initSortOptions() {
 
     ASC.addEventListener("click", ev => {
         fileInfoBody.typeOfSort = "ASC";
-        arrow.src = "images/free-icon-down-arrow-134210.png";
+        arrow.src = "https://localhost:5001/images/free-icon-down-arrow-134210.png";
         updatePage().then();
     });
 
     DESC.addEventListener("click", ev => {
         fileInfoBody.typeOfSort = "DESC";
-        arrow.src = "images/free-icon-up-arrow-134211.png";
+        arrow.src = "https://localhost:5001/images/free-icon-up-arrow-134211.png";
         updatePage().then();
     });
 

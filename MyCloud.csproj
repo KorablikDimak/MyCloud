@@ -20,7 +20,7 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\data" />
-      <Folder Include="wwwroot\js\Login" />
+      <Folder Include="wwwroot\js\Account" />
     </ItemGroup>
 
     <ItemGroup>

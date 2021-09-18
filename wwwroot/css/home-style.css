@@ -2,6 +2,10 @@
     margin: 0;
 }
 
+a {
+    text-decoration: none;
+}
+
 body {
     background-color: #f1f1f1;
 }
@@ -107,10 +111,12 @@ body {
 
 .authorisation {
     font-size: 26px;
+    color: #818181;
     font-family: sans-serif;
     width: 30%;
     border: 3px solid #80a4ff;
     background-color: #dce4ff;
+    transition: all 0.18s ease-in-out;
     border-radius: 15px;
     padding: 5px;
     text-align: center;
@@ -118,11 +124,11 @@ body {
     line-height: 42px;
     min-width: 90px;
     cursor: pointer;
-    transition: all 0.18s ease-in-out;
 }
 
 .authorisation:hover {
     background-color: #b9caff;
+    color: #ffffff;
 }
 
 .user-photo {

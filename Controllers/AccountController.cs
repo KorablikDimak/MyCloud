@@ -2,16 +2,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MyCloud.Controllers
 {
-    public class LoginController : Controller
+    public class AccountController : Controller
     {
         [HttpGet]
-        public IActionResult Registration()
+        public IActionResult Login()
         {
             return View();
         }
-
+        
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Registration()
         {
             return View();
         }

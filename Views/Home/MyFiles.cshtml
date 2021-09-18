@@ -3,48 +3,48 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width">
-        <title>My cloud</title>
-        <link rel="stylesheet" href="css/home-style.css"/>
+        <title>My files</title>
+        <link rel="stylesheet" href="~/css/home-style.css"/>
     </head>
 <body>
     <div class="container" id="container">
         <div class="drop-message">
-            <img class="drop-message-img" src="images/free-icon-download-126488.png" alt=""/>
+            <img class="drop-message-img" src="~/images/free-icon-download-126488.png" alt=""/>
             <p class="drop-message-text">Перетащите файл сюда чтобы загрузить его</p>
         </div>
         <div class="head-container">
             <div class="head-left">
                 <label class="search-container" for="search-input">
-                    <img alt="" src="images/free-icon-search-149309.png" class="search-img"/>
+                    <img alt="" src="~/images/free-icon-search-149309.png" class="search-img"/>
                     <input type="text" id="search-input" class="search" placeholder="Поиск..."/>
                 </label>
             </div>
             <div class="head-center"></div>
             <div class="head-right">
-                <img alt="user" src="images/free-icon-user-149452.png" class="user-photo"/>
-                <a class="authorisation">Выйти</a>
+                <img alt="user" src="~/images/free-icon-user-149452.png" class="user-photo"/>
+                <a href="https://localhost:5001/Account/Login" class="authorisation">Выйти</a>
             </div>
         </div>
         <div class="main-container">
             <div class="left-slider">
                 <label for="load-file" class="load-label">
-                    <img src="images/free-icon-download-126488.png" alt="" class="img-in-slider"/>
+                    <img src="~/images/free-icon-download-126488.png" alt="" class="img-in-slider"/>
                     <div class="empty"></div>
                     Загрузить файл
                 </label>
                 <input type="file" id="load-file" name="files" class="load-file-input" multiple/>
                 <div class="my-files">
-                    <img alt="" src="images/free-icon-folder-149334.png" class="img-in-slider"/>
+                    <img alt="" src="~/images/free-icon-folder-149334.png" class="img-in-slider"/>
                     <div class="empty"></div>
                     <a class="left-slider-font">Мои файлы</a>
                 </div>
                 <div class="current-files">
-                    <img alt="" src="images/free-icon-users-149448.png" class="img-in-slider"/>
+                    <img alt="" src="~/images/free-icon-users-149448.png" class="img-in-slider"/>
                     <div class="empty"></div>
                     <a class="left-slider-font">Общие файлы</a>
                 </div>
                 <div class="delete-all" id="delete-all-files">
-                    <img alt="" src="images/free-icon-garbage-126468.png" class="img-in-slider"/>
+                    <img alt="" src="~/images/free-icon-garbage-126468.png" class="img-in-slider"/>
                     <div class="empty"></div>
                     <p class="left-slider-font">Удалить всё</p>
                 </div>
@@ -99,15 +99,15 @@
                         </div>
                         <div class="sort-type-icon1" id="current-sort-type">По имени</div>
                         <div class="sort-type-icon2" >
-                            <img src="images/free-icon-down-arrow-134210.png" alt="" class="next-img" id="arrow"/>
+                            <img src="~/images/free-icon-down-arrow-134210.png" alt="" class="next-img" id="arrow"/>
                         </div>
                     </div>
                     <div class="icons">
                         <div class="icon-table-container">
-                            <img alt="" src="images/free-icon-menu-table346714.png" class="icon-table"/>
+                            <img alt="" src="~/images/free-icon-menu-table346714.png" class="icon-table"/>
                         </div>
                         <div class="icon-list-container">
-                            <img alt="" src="images/free-icon-menu-list346709.png" class="icon-list"/>
+                            <img alt="" src="~/images/free-icon-menu-list346709.png" class="icon-list"/>
                         </div>
                     </div>
                 </div>
@@ -117,10 +117,10 @@
             </div>
         </div>
     </div>
-    <script src="js/Home/updatePage.js"></script>
-    <script src="js/Home/dragAndDrop.js"></script>
-    <script src="js/Home/gradientFunction.js"></script>
-    <script src="js/Home/loadFiles.js"></script>
-    <script src="js/Home/initPage.js"></script>
+    <script src="~/js/Home/updatePage.js"></script>
+    <script src="~/js/Home/dragAndDrop.js"></script>
+    <script src="~/js/Home/gradientFunction.js"></script>
+    <script src="~/js/Home/loadFiles.js"></script>
+    <script src="~/js/Home/initPage.js"></script>
 </body>
 </html>

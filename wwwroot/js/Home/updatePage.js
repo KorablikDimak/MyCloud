@@ -65,7 +65,7 @@ function showFileTable(name, typeOfFile) {
         `<p id=\"load-this-${name}\">Скачать</p>\n` +
         `<p id=\"delete-this-${name}\">Удалить</p>\n` +
         `</div>` +
-        `<img  alt=\"\" src=\"images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
+        `<img  alt=\"\" src=\"https://localhost:5001/images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
         `<div class=\"file-name\">${createCurrentFileName(name, typeOfFile)}</div>\n`;
     return file;
 }

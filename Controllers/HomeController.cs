@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyCloud.Models.MyFile;
@@ -15,12 +18,14 @@ namespace MyCloud.Controllers
         private const long MaxMemorySize = 10737418240;
         private const string Connect = "Data Source=LAPTOP-KPPKGVU7\\LOVE;Initial Catalog=MyCloud;Persist Security Info=True;User ID=root;Password=Faggot_2002";
             
+        [Authorize]
         [HttpGet]
         public IActionResult MyFiles()
         {
             return View();
         }
 
+        [Authorize]
         [RequestSizeLimit(1073741824)]
         [HttpPost("LoadFile")]
         public async Task<IActionResult> LoadFile(ICollection<IFormFile> files)
@@ -80,6 +85,7 @@ namespace MyCloud.Controllers
             return dirInfo.GetFiles().Sum(file => file.Length) + fileSize <= MaxMemorySize;
         }
 
+        [Authorize]
         [HttpPost("GetFileInfo")]
         public async Task<List<MyFileInfo>> GetFileInfo([FromBody] SortType sortType)
         {
@@ -115,6 +121,7 @@ namespace MyCloud.Controllers
             return fileInfoToSend;
         }
 
+        [Authorize]
         [RequestSizeLimit(1073741824)]
         [HttpPost("GetFile")]
         public VirtualFileResult GetVirtualFile([FromBody] string fileName)
@@ -123,6 +130,7 @@ namespace MyCloud.Controllers
             return File(filepath, "application/octet-stream", fileName);
         }
 
+        [Authorize]
         [HttpDelete("DeleteOneFile")]
         public async Task<IActionResult> DeleteOneFile([FromBody] string fileName)
         {
@@ -132,6 +140,7 @@ namespace MyCloud.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete("DeleteAllFiles")]
         public async Task<IActionResult> DeleteAllFiles()
         {
@@ -174,11 +183,20 @@ namespace MyCloud.Controllers
             return true;
         }
 
+        [Authorize]
         [HttpGet("GetMemorySize")]
         public long GetMemorySize()
         {
             var dirInfo = new DirectoryInfo("wwwroot\\data\\");
             return dirInfo.GetFiles().Sum(file => file.Length);
+        }
+        
+        [Authorize]
+        [HttpGet("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
         }
     }
 }

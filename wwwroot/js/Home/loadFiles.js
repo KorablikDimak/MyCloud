@@ -34,15 +34,7 @@ async function loadInputChanged(loadInput) {
 }
 
 async function loadFileByClick(name) {
-    const init = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(name)
-    }
-    
-    let response = await fetch("https://localhost:5001/GetFile", init);
+    let response = await sendJsonMessage("https://localhost:5001/GetFile", 'POST', name)
     let blob = await response.blob();
     let url = await URL.createObjectURL(blob);
 
@@ -57,26 +49,14 @@ async function loadFileByClick(name) {
 
 async function deleteOneFile(name) {
     if (confirm("Вы уверены, что хотите удалить файл?")) {
-        const init = {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(name)
-        }
-        await fetch("https://localhost:5001/DeleteOneFile", init);
-        
+        await sendJsonMessage("https://localhost:5001/DeleteOneFile", 'DELETE', name)
         updatePage().then();
     }
 }
 
 async function deleteAllFiles() {
     if (confirm("Вы уверены, что хотите удалить все файлы?")) {
-        const init = {
-            method: 'DELETE'
-        }
-        await fetch("https://localhost:5001/DeleteAllFiles", init);
-        
+        await sendJsonMessage("https://localhost:5001/DeleteAllFiles", 'DELETE')
         updatePage().then();
     }
 }

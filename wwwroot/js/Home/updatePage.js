@@ -17,22 +17,16 @@ function clearFileContainer() {
 }
 
 async function loadFileInfo() {
-    const init = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            orderBy: fileInfoBody.orderBy,
-            typeOfSort: fileInfoBody.typeOfSort
-        })
+    const message = {
+        orderBy: fileInfoBody.orderBy,
+        typeOfSort: fileInfoBody.typeOfSort
     }
-    const response = await fetch("https://localhost:5001/GetFileInfo", init);
+    let response = await sendJsonMessage("https://localhost:5001/GetFileInfo", 'POST', message);
     return await response.json();
 }
 
 async function updateFileContainer() {
-    let json = await loadFileInfo();
+    const json = await loadFileInfo();
     pullFileContainer(json);
 }
 
@@ -98,7 +92,8 @@ function createCurrentFileName(fileName, typeOfFile) {
 }
 
 async function showFreeMemory() {
-    let freeSize = 10240 - Math.round((await getMemorySize()) / 1024 / 1024);
+    let memorySize = await getMemorySize();
+    const freeSize = 10240 - Math.round(memorySize / 1024 / 1024);
     updateMemoryText(freeSize);
     updateMemoryIndicator(freeSize);
 }
@@ -117,9 +112,6 @@ function updateMemoryIndicator(freeSize) {
 }
 
 async function getMemorySize() {
-    const init = {
-        method: 'GET'
-    }
-    const response = await fetch("https://localhost:5001/GetMemorySize", init);
+    let response = await sendJsonMessage("https://localhost:5001/GetMemorySize", 'GET');
     return await response.json();
 }

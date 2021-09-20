@@ -7,7 +7,15 @@ function initPage() {
     initSortOptions();
     initShowTypeButtons();
     initSearching();
+    initLogOutButton().then();
     updatePage().then();
+}
+
+async function initLogOutButton() {
+    let logOutButton = document.getElementById("logOut-button")
+    logOutButton.addEventListener("click", ev => {
+        return sendJsonMessage("https://localhost:5001/Logout", 'GET').then();
+    });
 }
 
 function initSearching() {

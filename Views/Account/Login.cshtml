@@ -11,18 +11,20 @@
         <div class="container">
             <div class="login-form">
                 <div class="header"></div>
-                <div class="login-input-container" id="login-input-container">
+                <div class="login-input-container">
                     <input class="login-input" id="login-input" placeholder="Логин"/>
                 </div>
-                <div class="login-input-container" id="password-input-container">
+                <div class="login-input-container">
                     <input class="login-input" id="password-input" placeholder="Пароль"/>
                 </div>
                 <div class="footer">
                     <a href="https://localhost:5001/Account/Registration" class="login-button" id="registration-button">Регистрация</a>
                     <div class="empty"></div>
-                    <a href="https://localhost:5001/Home/MyFiles" class="login-button" id="login-button">Войти</a>
+                    <div class="login-button" id="login-button">Войти</div>
                 </div>
             </div>
         </div>
+        <script src="~/js/sendMessage.js"></script>
+        <script src="~/js/Account/login.js"></script>
     </body>
 </html>

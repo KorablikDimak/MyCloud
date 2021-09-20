@@ -12,9 +12,11 @@ function initPage() {
 }
 
 async function initLogOutButton() {
-    let logOutButton = document.getElementById("logOut-button")
+    let logOutButton = document.getElementById("logOut-button");
     logOutButton.addEventListener("click", ev => {
-        return sendJsonMessage("https://localhost:5001/Logout", 'GET').then();
+        sendJsonMessage("https://localhost:5001/Logout", 'GET').then(r => {
+            window.location = "https://localhost:5001/Account/Login";
+        });
     });
 }
 

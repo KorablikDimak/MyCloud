@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyCloud.Models.MyFile;
 
 namespace MyCloud.Controllers
@@ -16,8 +16,13 @@ namespace MyCloud.Controllers
     public class HomeController : Controller
     {
         private const long MaxMemorySize = 10737418240;
-        private const string Connect = "Data Source=LAPTOP-KPPKGVU7\\LOVE;Initial Catalog=MyCloud;Persist Security Info=True;User ID=root;Password=Faggot_2002";
-            
+        private readonly MyFileInfoContext _databaseContext;
+
+        public HomeController(MyFileInfoContext context)
+        {
+            _databaseContext = context;
+        }
+        
         [Authorize]
         [HttpGet]
         public IActionResult MyFiles()
@@ -38,7 +43,12 @@ namespace MyCloud.Controllers
                 if (!IsMemoryFree(file.Length)) return new ConflictResult();
                 
                 var fileInfo = new FileInfo(filePath);
-                var myFileInfo = new MyFileInfo(fileInfo.Name, fileInfo.Extension, fileInfo.CreationTime, file.Length);
+                var myFileInfo = new MyFileInfo 
+                    {
+                        Name = fileInfo.Name, 
+                        TypeOfFile = fileInfo.Extension, 
+                        Size = file.Length
+                    };
 
                 if (await LoadFileInfoToDataBaseAsync(myFileInfo))
                 {
@@ -55,31 +65,23 @@ namespace MyCloud.Controllers
             return Ok();
         }
 
-        private static async Task<bool> LoadFileInfoToDataBaseAsync(MyFileInfo fileInfo)
+        private async Task<bool> LoadFileInfoToDataBaseAsync(MyFileInfo fileInfo)
         {
-            var connection = new SqlConnection(Connect);
-            await using (connection)
+            try
             {
-                try
-                {
-                    var commandText = "INSERT INTO Files (name, typeoffile, datetime, size) VALUES " +
-                                      $"(N'{fileInfo.Name}', N'{fileInfo.TypeOfFile}', '{fileInfo.DateTimeUpload}', {fileInfo.Size})";
-                    await connection.OpenAsync();
-                    var command = new SqlCommand(commandText, connection);
-                    await command.ExecuteNonQueryAsync();
-                    await connection.CloseAsync();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return false;
-                }
+                await _databaseContext.Files.AddAsync(fileInfo);
+                await _databaseContext.SaveChangesAsync();
             }
-
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            
             return true;
         }
 
-        private static bool IsMemoryFree(long fileSize)
+        private bool IsMemoryFree(long fileSize)
         {
             var dirInfo = new DirectoryInfo("wwwroot\\data\\");
             return dirInfo.GetFiles().Sum(file => file.Length) + fileSize <= MaxMemorySize;
@@ -87,37 +89,9 @@ namespace MyCloud.Controllers
 
         [Authorize]
         [HttpPost("GetFileInfo")]
-        public async Task<List<MyFileInfo>> GetFileInfo([FromBody] SortType sortType)
+        public List<MyFileInfo> GetFileInfo([FromBody] SortType sortType)
         {
-            var fileInfoToSend = new List<MyFileInfo>();
-
-            var connection = new SqlConnection(Connect);
-            await using (connection)
-            {
-                try
-                {
-                    var commandText = $"SELECT * FROM Files ORDER BY {sortType.OrderBy} {sortType.TypeOfSort}";
-                    await connection.OpenAsync();
-                    var command = new SqlCommand(commandText, connection);
-                    var reader = await command.ExecuteReaderAsync();
-                    while (await reader.ReadAsync())
-                    {
-                        var fileInfo = new MyFileInfo(
-                            reader.GetInt32(0), 
-                            reader.GetString(1), 
-                            reader.GetString(2), 
-                            reader.GetSqlDateTime(3), 
-                            reader.GetInt64(4));
-                        fileInfoToSend.Add(fileInfo);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return null;
-                }
-            }
-
+            var fileInfoToSend = new List<MyFileInfo>(_databaseContext.Files.OrderBy(file => sortType.OrderBy));
             return fileInfoToSend;
         }
 
@@ -160,24 +134,20 @@ namespace MyCloud.Controllers
             return Ok();
         }
 
-        private static async Task<bool> DeleteFileFromDataBaseAsync(string name)
+        private async Task<bool> DeleteFileFromDataBaseAsync(string name)
         {
-            var connection = new SqlConnection(Connect);
-            await using (connection)
+            try
             {
-                try
-                {
-                    var commandText = $"DELETE FROM Files WHERE name = N'{name}'";
-                    await connection.OpenAsync();
-                    var command = new SqlCommand(commandText, connection);
-                    await command.ExecuteNonQueryAsync();
-                    await connection.CloseAsync();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return false;
-                }
+                MyFileInfo fileInfo = await _databaseContext.Files.FirstOrDefaultAsync(file => file.Name == name);
+                if (fileInfo == null) return false;
+                    
+                _databaseContext.Files.Remove(fileInfo);
+                await _databaseContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
             }
 
             return true;
@@ -196,7 +166,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account");
+            return Ok();
         }
     }
 }

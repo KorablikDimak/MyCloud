@@ -28,16 +28,16 @@ namespace MyCloud.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
-            if (!ModelState.IsValid) return View();
+            if (!ModelState.IsValid) return new ForbidResult();
             
             var user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == loginModel.UserName && 
                 userData.Password == loginModel.Password);
 
-            if (user == null) return View();
+            if (user == null) return new ForbidResult();
             
             await AuthenticateAsync(loginModel.UserName);
-            return RedirectToAction("MyFiles", "Home");
+            return Ok();
         }
         
         [HttpGet]
@@ -49,12 +49,12 @@ namespace MyCloud.Controllers
         [HttpPost("Registration")]
         public async Task<IActionResult> Registration([FromBody] RegistrationModel registrationModel)
         {
-            if (!ModelState.IsValid) return View();
+            if (!ModelState.IsValid) return new ForbidResult();
             
             var user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == registrationModel.UserName);
 
-            if (user != null) return View();
+            if (user != null) return new ConflictResult();
             
             _databaseContext.Add(new User 
             { 
@@ -63,7 +63,7 @@ namespace MyCloud.Controllers
             });
             await _databaseContext.SaveChangesAsync();
             
-            return RedirectToAction("Login", "Account");
+            return Ok();
         }
 
         private async Task AuthenticateAsync(string userName)

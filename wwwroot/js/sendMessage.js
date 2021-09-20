@@ -14,5 +14,6 @@ async function sendJsonMessage (uri, method, message = null) {
             body: JSON.stringify(message)
         }
     }
+    
     return await fetch(uri, init);
 }

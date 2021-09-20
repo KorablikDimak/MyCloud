@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using MyCloud.Models.MyFile;
 using MyCloud.Models.User;
 
 namespace MyCloud
@@ -22,6 +23,7 @@ namespace MyCloud
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<UserContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<MyFileInfoContext>(options => options.UseSqlServer(connection));
             
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

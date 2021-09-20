@@ -1,5 +1,3 @@
-using System;
-
 namespace MyCloud.Models.MyFile
 {
     public class MyFileInfo

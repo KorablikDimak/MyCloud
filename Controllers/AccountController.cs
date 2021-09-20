@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyCloud.Models.Login;
@@ -40,6 +42,20 @@ namespace MyCloud.Controllers
             return Ok();
         }
         
+        private async Task AuthenticateAsync(string userName)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+            };
+            
+            var id = new ClaimsIdentity(claims, "ApplicationCookie",
+                ClaimsIdentity.DefaultNameClaimType, 
+                ClaimsIdentity.DefaultRoleClaimType);
+            
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+        
         [HttpGet]
         public IActionResult Registration()
         {
@@ -50,6 +66,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> Registration([FromBody] RegistrationModel registrationModel)
         {
             if (!ModelState.IsValid) return new ForbidResult();
+            if (!CreateUserDirectory(registrationModel.UserName)) return new ConflictResult();
             
             var user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == registrationModel.UserName);
@@ -65,19 +82,38 @@ namespace MyCloud.Controllers
             
             return Ok();
         }
-
-        private async Task AuthenticateAsync(string userName)
+        
+        private bool CreateUserDirectory(string userName)
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-            };
+            if (Directory.Exists($"wwwroot\\data\\{userName}")) return false;
+            Directory.CreateDirectory($"wwwroot\\data\\{userName}");
+            return true;
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteAccount")]
+        public async Task<IActionResult> DeleteAccount([FromBody] string password)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            var user = await _databaseContext.Users.FirstOrDefaultAsync(userData => 
+                userData.UserName == User.Identity.Name && userData.Password == password);
             
-            var id = new ClaimsIdentity(claims, "ApplicationCookie",
-                ClaimsIdentity.DefaultNameClaimType, 
-                ClaimsIdentity.DefaultRoleClaimType);
+            if (user == null) return new ConflictResult();
+            _databaseContext.Users.Remove(user);
+            await _databaseContext.SaveChangesAsync();
             
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+            if (!DeleteUserDirectory(User.Identity.Name)) return new ConflictResult();
+            return Ok();
+        }
+
+        private bool DeleteUserDirectory(string userName)
+        {
+            var directoryInfo = new DirectoryInfo($"~\\data\\{userName}");
+
+            if (!directoryInfo.Exists) return false;
+            
+            directoryInfo.Delete();
+            return true;
         }
     }
 }

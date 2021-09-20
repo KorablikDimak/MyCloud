@@ -38,7 +38,8 @@ namespace MyCloud.Controllers
             foreach (var file in files) 
             {
                 var untrustedFileName = Path.GetFileName(file.FileName);
-                var filePath = $"wwwroot\\data\\{untrustedFileName}";
+                if (User.Identity == null) return new ConflictResult();
+                var filePath = $"wwwroot\\data\\{User.Identity.Name}\\{untrustedFileName}";
                 await using var stream = System.IO.File.Create(filePath);
                 if (!IsMemoryFree(file.Length)) return new ConflictResult();
                 
@@ -83,7 +84,8 @@ namespace MyCloud.Controllers
 
         private bool IsMemoryFree(long fileSize)
         {
-            var dirInfo = new DirectoryInfo("wwwroot\\data\\");
+            if (User.Identity == null) return false;
+            var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
             return dirInfo.GetFiles().Sum(file => file.Length) + fileSize <= MaxMemorySize;
         }
 
@@ -91,7 +93,19 @@ namespace MyCloud.Controllers
         [HttpPost("GetFileInfo")]
         public List<MyFileInfo> GetFileInfo([FromBody] SortType sortType)
         {
-            var fileInfoToSend = new List<MyFileInfo>(_databaseContext.Files.OrderBy(file => sortType.OrderBy));
+            List<MyFileInfo> fileInfoToSend = sortType.OrderBy switch
+            {
+                "typeoffile" => _databaseContext.Files.OrderBy(file => file.TypeOfFile).ToList(),
+                "datetime" => _databaseContext.Files.OrderBy(file => file.Name).ToList(),
+                "size" => _databaseContext.Files.OrderBy(file => file.Size).ToList(),
+                _ => _databaseContext.Files.OrderBy(file => file.Name).ToList()
+            };
+
+            if (sortType.TypeOfSort == "DESC")
+            {
+                fileInfoToSend.Reverse();
+            }
+            
             return fileInfoToSend;
         }
 
@@ -100,7 +114,8 @@ namespace MyCloud.Controllers
         [HttpPost("GetFile")]
         public VirtualFileResult GetVirtualFile([FromBody] string fileName)
         {
-            string filepath = Path.Combine("~/data", fileName);
+            if (User.Identity == null) return null;
+            string filepath = Path.Combine($"~/data/{User.Identity.Name}", fileName);
             return File(filepath, "application/octet-stream", fileName);
         }
 
@@ -108,7 +123,8 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteOneFile")]
         public async Task<IActionResult> DeleteOneFile([FromBody] string fileName)
         {
-            string filepath = Path.Combine("wwwroot\\data", fileName);
+            if (User.Identity == null) return new ConflictResult();
+            string filepath = Path.Combine($"wwwroot\\data\\{User.Identity.Name}", fileName);
             if (!await DeleteFileFromDataBaseAsync(fileName)) return new ConflictResult();
             System.IO.File.Delete(filepath);
             return Ok();
@@ -118,7 +134,8 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteAllFiles")]
         public async Task<IActionResult> DeleteAllFiles()
         {
-            var dirInfo = new DirectoryInfo("wwwroot\\data\\");
+            if (User.Identity == null) return new ConflictResult();
+            var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
             foreach (var file in dirInfo.GetFiles())
             {
                 if (await DeleteFileFromDataBaseAsync(file.Name))
@@ -157,7 +174,8 @@ namespace MyCloud.Controllers
         [HttpGet("GetMemorySize")]
         public long GetMemorySize()
         {
-            var dirInfo = new DirectoryInfo("wwwroot\\data\\");
+            if (User.Identity == null) return 0;
+            var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
             return dirInfo.GetFiles().Sum(file => file.Length);
         }
         

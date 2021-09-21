@@ -6,19 +6,18 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using MyCloud.DataBase;
 using MyCloud.Models.Login;
-using MyCloud.Models.User;
 
 namespace MyCloud.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserContext _databaseContext;
+        private readonly IDatabaseRequest _databaseRequest;
 
-        public AccountController(UserContext context)
+        public AccountController(DataContext context)
         {
-            _databaseContext = context;
+            _databaseRequest = new DatabaseRequest(context);
         }
         
         [HttpGet]
@@ -31,11 +30,8 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
             if (!ModelState.IsValid) return new ForbidResult();
-            
-            var user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
-                userData.UserName == loginModel.UserName && 
-                userData.Password == loginModel.Password);
 
+            var user = await _databaseRequest.FindUserAsync(loginModel.UserName, loginModel.Password);
             if (user == null) return new ForbidResult();
             
             await AuthenticateAsync(loginModel.UserName);
@@ -67,19 +63,9 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
             if (!CreateUserDirectory(registrationModel.UserName)) return new ConflictResult();
-            
-            var user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
-                userData.UserName == registrationModel.UserName);
+            bool isAdded = await _databaseRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
+            if (!isAdded) return new ConflictResult();
 
-            if (user != null) return new ConflictResult();
-            
-            _databaseContext.Add(new User 
-            { 
-                UserName = registrationModel.UserName, 
-                Password = registrationModel.Password
-            });
-            await _databaseContext.SaveChangesAsync();
-            
             return Ok();
         }
         
@@ -92,16 +78,11 @@ namespace MyCloud.Controllers
 
         [Authorize]
         [HttpDelete("DeleteAccount")]
-        public async Task<IActionResult> DeleteAccount([FromBody] string password)
+        public async Task<IActionResult> DeleteAccount([FromBody] LoginModel loginModel)
         {
             if (User.Identity == null) return new ConflictResult();
-            var user = await _databaseContext.Users.FirstOrDefaultAsync(userData => 
-                userData.UserName == User.Identity.Name && userData.Password == password);
-            
-            if (user == null) return new ConflictResult();
-            _databaseContext.Users.Remove(user);
-            await _databaseContext.SaveChangesAsync();
-            
+            bool isDeleted = await _databaseRequest.DeleteUserAsync(loginModel.UserName, loginModel.Password);
+            if (!isDeleted) return new ConflictResult();
             if (!DeleteUserDirectory(User.Identity.Name)) return new ConflictResult();
             return Ok();
         }

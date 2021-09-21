@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using MyCloud.DataBase;
 using MyCloud.Models.MyFile;
 
 namespace MyCloud.Controllers
@@ -16,11 +15,11 @@ namespace MyCloud.Controllers
     public class HomeController : Controller
     {
         private const long MaxMemorySize = 10737418240;
-        private readonly MyFileInfoContext _databaseContext;
+        private readonly IDatabaseRequest _databaseRequest;
 
-        public HomeController(MyFileInfoContext context)
+        public HomeController(DataContext context)
         {
-            _databaseContext = context;
+            _databaseRequest = new DatabaseRequest(context);
         }
         
         [Authorize]
@@ -37,21 +36,23 @@ namespace MyCloud.Controllers
         {
             foreach (var file in files) 
             {
-                var untrustedFileName = Path.GetFileName(file.FileName);
                 if (User.Identity == null) return new ConflictResult();
-                var filePath = $"wwwroot\\data\\{User.Identity.Name}\\{untrustedFileName}";
+                string untrustedFileName = Path.GetFileName(file.FileName);
+                string filePath = $"wwwroot\\data\\{User.Identity.Name}\\{untrustedFileName}";
                 await using var stream = System.IO.File.Create(filePath);
                 if (!IsMemoryFree(file.Length)) return new ConflictResult();
                 
-                var fileInfo = new FileInfo(filePath);
+                var fileInfo = new FileInfo(stream.Name);
                 var myFileInfo = new MyFileInfo 
                     {
                         Name = fileInfo.Name, 
                         TypeOfFile = fileInfo.Extension, 
+                        DateTime = fileInfo.CreationTime,
                         Size = file.Length
                     };
 
-                if (await LoadFileInfoToDataBaseAsync(myFileInfo))
+                bool isAdded = await _databaseRequest.AddFileAsync(User.Identity.Name, myFileInfo);
+                if (isAdded)
                 {
                     await file.CopyToAsync(stream);
                 }
@@ -66,22 +67,6 @@ namespace MyCloud.Controllers
             return Ok();
         }
 
-        private async Task<bool> LoadFileInfoToDataBaseAsync(MyFileInfo fileInfo)
-        {
-            try
-            {
-                await _databaseContext.Files.AddAsync(fileInfo);
-                await _databaseContext.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-            
-            return true;
-        }
-
         private bool IsMemoryFree(long fileSize)
         {
             if (User.Identity == null) return false;
@@ -93,20 +78,23 @@ namespace MyCloud.Controllers
         [HttpPost("GetFileInfo")]
         public List<MyFileInfo> GetFileInfo([FromBody] SortType sortType)
         {
-            List<MyFileInfo> fileInfoToSend = sortType.OrderBy switch
+            if (User.Identity == null) return null;
+            
+            IQueryable<MyFileInfo> files = _databaseRequest.FindFiles(User.Identity.Name);
+            
+            files = sortType.OrderBy switch
             {
-                "typeoffile" => _databaseContext.Files.OrderBy(file => file.TypeOfFile).ToList(),
-                "datetime" => _databaseContext.Files.OrderBy(file => file.Name).ToList(),
-                "size" => _databaseContext.Files.OrderBy(file => file.Size).ToList(),
-                _ => _databaseContext.Files.OrderBy(file => file.Name).ToList()
+                "typeoffile" => files.OrderBy(file => file.TypeOfFile),
+                "datetime" => files.OrderBy(file => file.DateTime),
+                "size" => files.OrderBy(file => file.Size),
+                _ => files.OrderBy(file => file.Name)
             };
-
             if (sortType.TypeOfSort == "DESC")
             {
-                fileInfoToSend.Reverse();
+                files = files.Reverse();
             }
             
-            return fileInfoToSend;
+            return files.ToList();
         }
 
         [Authorize]
@@ -125,7 +113,8 @@ namespace MyCloud.Controllers
         {
             if (User.Identity == null) return new ConflictResult();
             string filepath = Path.Combine($"wwwroot\\data\\{User.Identity.Name}", fileName);
-            if (!await DeleteFileFromDataBaseAsync(fileName)) return new ConflictResult();
+            bool isDeleted = await _databaseRequest.DeleteFileAsync(User.Identity.Name, fileName);
+            if (!isDeleted) return new ConflictResult();
             System.IO.File.Delete(filepath);
             return Ok();
         }
@@ -138,36 +127,12 @@ namespace MyCloud.Controllers
             var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
             foreach (var file in dirInfo.GetFiles())
             {
-                if (await DeleteFileFromDataBaseAsync(file.Name))
-                {
-                    file.Delete();
-                }
-                else
-                {
-                    return new ConflictResult();
-                }
+                bool isDeleted = await _databaseRequest.DeleteFileAsync(User.Identity.Name, file.Name);
+                if (!isDeleted) return new ConflictResult();
+                file.Delete();
             }
             
             return Ok();
-        }
-
-        private async Task<bool> DeleteFileFromDataBaseAsync(string name)
-        {
-            try
-            {
-                MyFileInfo fileInfo = await _databaseContext.Files.FirstOrDefaultAsync(file => file.Name == name);
-                if (fileInfo == null) return false;
-                    
-                _databaseContext.Files.Remove(fileInfo);
-                await _databaseContext.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-
-            return true;
         }
 
         [Authorize]

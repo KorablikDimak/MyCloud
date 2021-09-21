@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="wwwroot\data\dima" />
+      <Folder Include="wwwroot\data" />
     </ItemGroup>
 
     <ItemGroup>

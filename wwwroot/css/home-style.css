@@ -132,8 +132,15 @@ body {
 }
 
 .user-photo {
+    border-radius: 30px;
     height: 60px;
     width: 60px;
+    cursor: pointer;
+    transition: all 0.18s ease-in-out;
+}
+
+#profile:hover {
+    background-color: #cac8cd;
 }
 
 .main-container {

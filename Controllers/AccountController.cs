@@ -77,6 +77,13 @@ namespace MyCloud.Controllers
         }
 
         [Authorize]
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            return View();
+        }
+
+        [Authorize]
         [HttpDelete("DeleteAccount")]
         public async Task<IActionResult> DeleteAccount([FromBody] LoginModel loginModel)
         {

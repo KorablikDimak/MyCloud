@@ -1,6 +1,7 @@
 initPage();
 
 function initPage() {
+    initRedirectToProfileButton();
     initLoader();
     initDeleter();
     initDragDrop();
@@ -9,6 +10,13 @@ function initPage() {
     initSearching();
     initLogOutButton().then();
     updatePage().then();
+}
+
+function initRedirectToProfileButton() {
+    let profileButton = document.getElementById("profile");
+    profileButton.addEventListener("click", ev => {
+        window.location = "Https://localhost:5001/Account/Profile"
+    });
 }
 
 async function initLogOutButton() {

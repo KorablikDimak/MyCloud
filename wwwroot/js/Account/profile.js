@@ -35,6 +35,15 @@ changePassword.addEventListener("click", ev => {
     container.classList.add('highlight');
 });
 
+let changePasswordWindow = document.getElementById("change-password-window");
+changePasswordWindow.addEventListener("click", ev => {
+    const target = ev.target;
+    if (target === changePasswordWindow) {
+        let container = document.getElementById("container");
+        container.classList.remove('highlight');
+    }
+});
+
 let deleteAccount = document.getElementById("delete-account");
 deleteAccount.addEventListener("click", ev => {
     if (confirm("Вы уверены, что хотите удалить свой аккаунт вместе со всеми файлами?\n" +

@@ -30,16 +30,17 @@ body {
     justify-content: center;
     flex-direction: column;
     opacity: 0;
-    z-index: -10;
+    z-index: -1;
     transition: all 0.3s ease-in-out;
 }
 
 .container.highlight .change-password-window {
     opacity: 1;
-    z-index: 5;
+    z-index: 1;
 }
 
 .change-password-container {
+    z-index: -1;
     border-radius: 15px;
     margin: 25% 25%;
 }

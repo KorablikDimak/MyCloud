@@ -17,3 +17,8 @@ async function sendJsonMessage (uri, method, message = null) {
     
     return await fetch(uri, init);
 }
+
+async function logout() {
+    await sendJsonMessage("https://localhost:5001/Home/Logout", 'GET')
+    window.location = "https://localhost:5001/Account/Login";
+}

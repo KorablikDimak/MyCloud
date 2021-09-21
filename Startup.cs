@@ -52,7 +52,7 @@ namespace MyCloud
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Account}/{action=Profile}");
+                    pattern: "{controller=Account}/{action=Login}");
             });
         }
     }

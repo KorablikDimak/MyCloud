@@ -25,11 +25,7 @@ confirmButton.addEventListener("click", ev => {
         NewPassword: document.getElementById("new-password").value
     };
     sendJsonMessage("https://localhost:5001/ChangePassword", 'PATCH', message).then(response => {
-        if (response.status === 200) {
-            sendJsonMessage("https://localhost:5001/Home/Logout", 'GET').then(response => {
-                window.location = "https://localhost:5001/Account/Login";
-            });
-        }
+        if (response.status === 200) logout().then();
     });
 });
 
@@ -41,5 +37,10 @@ changePassword.addEventListener("click", ev => {
 
 let deleteAccount = document.getElementById("delete-account");
 deleteAccount.addEventListener("click", ev => {
-    //TODO delete account
+    if (confirm("Вы уверены, что хотите удалить свой аккаунт вместе со всеми файлами?\n" +
+        "Восстановить аккаунт будет невозможно.")) {
+        sendJsonMessage("https://localhost:5001/DeleteAccount", "DELETE").then(response => {
+            if (response.status === 200) logout().then();
+        });
+    }
 });

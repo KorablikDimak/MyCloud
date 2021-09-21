@@ -8,7 +8,7 @@ function initPage() {
     initSortOptions();
     initShowTypeButtons();
     initSearching();
-    initLogOutButton().then();
+    initLogOutButton()
     updatePage().then();
 }
 
@@ -19,12 +19,10 @@ function initRedirectToProfileButton() {
     });
 }
 
-async function initLogOutButton() {
+function initLogOutButton() {
     let logOutButton = document.getElementById("logOut-button");
     logOutButton.addEventListener("click", ev => {
-        sendJsonMessage("https://localhost:5001/Logout", 'GET').then(r => {
-            window.location = "https://localhost:5001/Account/Login";
-        });
+        logout().then();
     });
 }
 

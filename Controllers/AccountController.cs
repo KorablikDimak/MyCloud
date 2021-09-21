@@ -7,17 +7,26 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCloud.DataBase;
+using MyCloud.DataBase.Interfaces;
 using MyCloud.Models.Login;
+using MyCloud.Models.User;
 
 namespace MyCloud.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IDatabaseRequest _databaseRequest;
+        private readonly IAdderIntoDatabase _adderIntoDatabase;
+        private readonly IChangerDataInDatabase _changerDataInDatabase;
+        private readonly IDeleterFromDatabase _deleterFromDatabase;
+        private readonly IFinderFromDatabase _finderFromDatabase;
 
         public AccountController(DataContext context)
         {
-            _databaseRequest = new DatabaseRequest(context);
+            DatabaseRequest databaseRequest = new DatabaseRequest(context);
+            _adderIntoDatabase = databaseRequest;
+            _changerDataInDatabase = databaseRequest;
+            _deleterFromDatabase = databaseRequest;
+            _finderFromDatabase = databaseRequest;
         }
         
         [HttpGet]
@@ -31,7 +40,7 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
 
-            var user = await _databaseRequest.FindUserAsync(loginModel.UserName, loginModel.Password);
+            var user = await _finderFromDatabase.FindUserAsync(loginModel.UserName, loginModel.Password);
             if (user == null) return new ForbidResult();
             
             await AuthenticateAsync(loginModel.UserName);
@@ -63,7 +72,7 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
             if (!CreateUserDirectory(registrationModel.UserName)) return new ConflictResult();
-            bool isAdded = await _databaseRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
+            bool isAdded = await _adderIntoDatabase.AddUserAsync(registrationModel.UserName, registrationModel.Password);
             if (!isAdded) return new ConflictResult();
 
             return Ok();
@@ -84,14 +93,13 @@ namespace MyCloud.Controllers
         }
 
         [Authorize]
-        [HttpDelete("DeleteAccount")]
-        public async Task<IActionResult> DeleteAccount([FromBody] LoginModel loginModel)
+        [HttpPatch("ChangeUserName")]
+        public async Task<IActionResult> ChangePersonality([FromBody] string newUserName, PersonalityData newPersonality)
         {
             if (User.Identity == null) return new ConflictResult();
-            bool isDeleted = await _databaseRequest.DeleteUserAsync(loginModel.UserName, loginModel.Password);
-            if (!isDeleted) return new ConflictResult();
-            if (!DeleteUserDirectory(User.Identity.Name)) return new ConflictResult();
-            return Ok();
+            bool isChanged = await _changerDataInDatabase.ChangePersonalityDataAsync(User.Identity.Name, newUserName, newPersonality);
+            if (isChanged) return Ok();
+            return new ConflictResult();
         }
 
         [Authorize]
@@ -99,11 +107,22 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel passwordModel)
         {
             if (User.Identity == null) return new ConflictResult();
-            bool isChanged = await _databaseRequest.ChangePasswordAsync(
+            bool isChanged = await _changerDataInDatabase.ChangePasswordAsync(
                 User.Identity.Name, 
                 passwordModel.OldPassword, 
                 passwordModel.NewPassword);
             if (!isChanged) return new ConflictResult();
+            return Ok();
+        }
+        
+        [Authorize]
+        [HttpDelete("DeleteAccount")]
+        public async Task<IActionResult> DeleteAccount([FromBody] LoginModel loginModel)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            bool isDeleted = await _deleterFromDatabase.DeleteUserAsync(loginModel.UserName, loginModel.Password);
+            if (!isDeleted) return new ConflictResult();
+            if (!DeleteUserDirectory(User.Identity.Name)) return new ConflictResult();
             return Ok();
         }
 

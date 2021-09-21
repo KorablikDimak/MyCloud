@@ -2,12 +2,13 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MyCloud.DataBase.Interfaces;
 using MyCloud.Models.MyFile;
 using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabaseRequest : IDatabaseRequest
+    public class DatabaseRequest : IAdderIntoDatabase, IChangerDataInDatabase, IDeleterFromDatabase, IFinderFromDatabase
     {
         private readonly DataContext _databaseContext;
 
@@ -53,6 +54,26 @@ namespace MyCloud.DataBase
                 User user = await FindUserAsync(userName, password);
                 if (user == null) return false;
                 _databaseContext.Users.Remove(user);
+                await _databaseContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> ChangePersonalityDataAsync(string oldUserName, string newUserName, PersonalityData newPersonality)
+        {
+            try
+            {
+                User user = await FindUserAsync(oldUserName);
+                if (user == null) return false;
+                user.UserName = newUserName;
+                user.PersonalityData.Name = newPersonality.Name;
+                user.PersonalityData.Surname = newPersonality.Surname;
                 await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)

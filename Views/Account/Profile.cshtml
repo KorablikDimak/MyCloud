@@ -8,7 +8,18 @@
         <link rel="stylesheet" href="~/css/profile-style.css"/>
     </head>
     <body>
-        <div class="container">
+        <div class="container" id="container">
+            <div class="change-password-window">
+                <div class="change-password-container">
+                    <div class="input-container">
+                        <input class="input" id="old-password" placeholder="Старый пароль"/>
+                    </div>
+                    <div class="input-container">
+                        <input class="input" id="new-password" placeholder="Новый пароль"/>
+                    </div>
+                    <div class="confirm" id="confirm">Подтвердить</div>
+                </div>
+            </div>
             <div class="left-container">
                 <div class="profile-photo">
                     <img class="profile-photo" id="photo" src="~/images/free-icon-user-149452.png" alt=""/>
@@ -32,6 +43,7 @@
                 <div class="button" id="delete-account">Удалить аккаунт</div>
             </div>
         </div>
+        <script src="~/js/sendMessage.js"></script>
         <script src="~/js/Account/profile.js"></script>
     </body>
 </html>

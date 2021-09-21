@@ -18,9 +18,25 @@ groupsView.addEventListener("click", ev => {
     //TODO groups
 });
 
+let confirmButton = document.getElementById("confirm");
+confirmButton.addEventListener("click", ev => {
+    let message = {
+        OldPassword: document.getElementById("old-password").value,
+        NewPassword: document.getElementById("new-password").value
+    };
+    sendJsonMessage("https://localhost:5001/ChangePassword", 'PATCH', message).then(response => {
+        if (response.status === 200) {
+            sendJsonMessage("https://localhost:5001/Home/Logout", 'GET').then(response => {
+                window.location = "https://localhost:5001/Account/Login";
+            });
+        }
+    });
+});
+
 let changePassword = document.getElementById("password-change");
 changePassword.addEventListener("click", ev => {
-    //TODO change password
+    let container = document.getElementById("container");
+    container.classList.add('highlight');
 });
 
 let deleteAccount = document.getElementById("delete-account");

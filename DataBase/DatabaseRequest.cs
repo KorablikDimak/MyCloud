@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +61,24 @@ namespace MyCloud.DataBase
                 return false;
             }
 
+            return true;
+        }
+
+        public async Task<bool> ChangePasswordAsync(string userName, string oldPassword, string newPassword)
+        {
+            try
+            {
+                User user = await FindUserAsync(userName, oldPassword);
+                if (user == null) return false;
+                user.Password = newPassword;
+                await _databaseContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            
             return true;
         }
 

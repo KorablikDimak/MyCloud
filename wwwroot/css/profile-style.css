@@ -15,6 +15,82 @@ body {
     display: flex;
 }
 
+.container.highlight {
+    background-color: rgba(113,113,113,0.49);
+}
+
+.change-password-window {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    opacity: 0;
+    z-index: -10;
+    transition: all 0.3s ease-in-out;
+}
+
+.container.highlight .change-password-window {
+    opacity: 1;
+    z-index: 5;
+}
+
+.change-password-container {
+    border-radius: 15px;
+    margin: 25% 25%;
+}
+
+.container.highlight .change-password-container {
+    background-color: #f1f1f1;
+}
+
+.input-container {
+    margin: 20px 20px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #b8b7ff;
+    transition: all 0.18s ease-in-out;
+}
+
+.input-container:hover {
+    border: 2px solid #7f7dff;
+    background-color: #c8c8c8;
+}
+
+.input {
+    width: 100%;
+    background-color: rgba(246,255,157,0);
+    border: none;
+    font-family: sans-serif;
+    font-size: 26px;
+}
+
+.input:focus {
+    outline-width: 0;
+}
+
+.confirm {
+    margin: 20px 20px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #7494ff;
+    font-size: 22px;
+    text-align: center;
+    cursor: pointer;
+    line-height: 32px;
+    color: #6e6e6e;
+    transition: all 0.18s ease-in-out;
+}
+
+.confirm:hover {
+    background-color: #324fa2;
+    color: #ffffff;
+}
+
 .left-container {
     width: 20%;
 }

@@ -94,6 +94,19 @@ namespace MyCloud.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPatch("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel passwordModel)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            bool isChanged = await _databaseRequest.ChangePasswordAsync(
+                User.Identity.Name, 
+                passwordModel.OldPassword, 
+                passwordModel.NewPassword);
+            if (!isChanged) return new ConflictResult();
+            return Ok();
+        }
+
         private bool DeleteUserDirectory(string userName)
         {
             var directoryInfo = new DirectoryInfo($"~\\data\\{userName}");

@@ -10,6 +10,7 @@ namespace MyCloud.DataBase
         public Task<User> FindUserAsync(string userName, string password);
         public Task<bool> AddUserAsync(string userName, string password);
         public Task<bool> DeleteUserAsync(string userName, string password);
+        public Task<bool> ChangePasswordAsync(string userName, string oldPassword, string newPassword);
         public Task<bool> AddFileAsync(string userName, MyFileInfo fileInfo);
         public IQueryable<MyFileInfo> FindFiles(string userName);
         public Task<bool> DeleteFileAsync(string userName, string fileName);

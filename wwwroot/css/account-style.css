@@ -73,7 +73,7 @@ a {
     text-align: center;
     cursor: pointer;
     line-height: 32px;
-    color: #434343;
+    color: #6e6e6e;
     transition: all 0.18s ease-in-out;
 }
 
@@ -83,5 +83,5 @@ a {
 }
 
 #registration-button {
-    width: auto;
+    width: 100%;
 }

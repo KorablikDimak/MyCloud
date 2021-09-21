@@ -116,5 +116,21 @@ namespace MyCloud.DataBase
 
             return true;
         }
+
+        public async Task<bool> DeleteAllFilesAsync(string userName)
+        {
+            try
+            {
+                _databaseContext.Files.RemoveRange(FindFiles(userName));
+                await _databaseContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

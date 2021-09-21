@@ -124,11 +124,13 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> DeleteAllFiles()
         {
             if (User.Identity == null) return new ConflictResult();
+            
+            bool isDeleted = await _databaseRequest.DeleteAllFilesAsync(User.Identity.Name);
+            if (!isDeleted) return new ConflictResult();
+            
             var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
             foreach (var file in dirInfo.GetFiles())
             {
-                bool isDeleted = await _databaseRequest.DeleteFileAsync(User.Identity.Name, file.Name);
-                if (!isDeleted) return new ConflictResult();
                 file.Delete();
             }
             

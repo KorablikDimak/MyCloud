@@ -5,6 +5,7 @@ namespace MyCloud.DataBase.Interfaces
 {
     public interface IDatabaseUsersRequest
     {
+        public Task<User> FindUserAsync(string userName);
         public Task<User> FindUserAsync(string userName, string password);
         public Task<bool> AddUserAsync(string userName, string password);
         public Task<bool> DeleteUserAsync(string userName, string password);

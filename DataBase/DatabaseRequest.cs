@@ -159,7 +159,7 @@ namespace MyCloud.DataBase
             return true;
         }
 
-        private async Task<User> FindUserAsync(string userName)
+        public async Task<User> FindUserAsync(string userName)
         {
             User user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == userName);

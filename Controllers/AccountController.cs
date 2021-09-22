@@ -18,12 +18,16 @@ namespace MyCloud.Controllers
     {
         private readonly IDatabaseUsersRequest _databaseUsersRequest;
         private readonly IDatabasePersonalityRequest _databasePersonalityRequest;
+        private readonly IDatabaseGroupsRequest _databaseGroupsRequest;
+        private delegate Task<bool> ChangeDelegate(Group group, string newOption);
 
         public AccountController(DataContext context)
         {
             DatabaseRequest databaseRequest = new DatabaseRequest(context);
+            DatabaseGroupRequest databaseGroupRequest = new DatabaseGroupRequest(context);
             _databaseUsersRequest = databaseRequest;
             _databasePersonalityRequest = databaseRequest;
+            _databaseGroupsRequest = databaseGroupRequest;
         }
         
         [HttpGet]
@@ -183,6 +187,86 @@ namespace MyCloud.Controllers
             }
             
             return true;
+        }
+
+        [Authorize]
+        [HttpPost("EnterInGroup")]
+        public async Task<IActionResult> EnterInGroup([FromBody] GroupLogin groupLogin)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            User user = await _databaseUsersRequest.FindUserAsync(User.Identity.Name);
+            if (user == null) return new ConflictResult();
+            Group group = await _databaseGroupsRequest.FindGroup(groupLogin);
+            if (group == null) return new ConflictResult();
+            bool isEntered = await _databaseGroupsRequest.AddUserInGroup(user, group);
+            if (isEntered) return Ok();
+            return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpDelete("LeaveFromGroup")]
+        public async Task<IActionResult> LeaveFromGroup([FromBody] string groupName)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            User user = await _databaseUsersRequest.FindUserAsync(User.Identity.Name);
+            if (user == null) return new ConflictResult();
+            Group group = await _databaseGroupsRequest.FindGroup(groupName);
+            if (group == null) return new ConflictResult();
+            bool isLeave = await _databaseGroupsRequest.RemoveUserFromGroup(user, group);
+            if (isLeave) return Ok();
+            return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpPost("CreateGroup")]
+        public async Task<IActionResult> CreateGroup([FromBody] GroupLogin groupLogin)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            User user = await _databaseUsersRequest.FindUserAsync(User.Identity.Name);
+            if (user == null) return new ConflictResult();
+            Group group = await _databaseGroupsRequest.FindGroup(groupLogin.GroupName);
+            if (group != null) return new ConflictResult();
+            bool isCreated = await _databaseGroupsRequest.CreateGroup(groupLogin, user);
+            if (isCreated) return Ok();
+            return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteGroup")]
+        public async Task<IActionResult> DeleteGroup([FromBody] GroupLogin groupLogin)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            Group group = await _databaseGroupsRequest.FindGroup(groupLogin);
+            if (group == null) return new ConflictResult();
+            bool isDeleted = await _databaseGroupsRequest.DeleteGroup(group);
+            if (isDeleted) return Ok();
+            return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpPatch("ChangeGroupName")]
+        public async Task<IActionResult> ChangeGroupName([FromBody] GroupLoginChange newGroupLogin)
+        {
+            ChangeDelegate changeDelegate = _databaseGroupsRequest.ChangeGroupName;
+            return await ChangeGroupLogin(changeDelegate, newGroupLogin);
+        }
+
+        [Authorize]
+        [HttpPatch("ChangeGroupPassword")]
+        public async Task<IActionResult> ChangeGroupPassword([FromBody] GroupLoginChange newGroupLogin)
+        {
+            ChangeDelegate changeDelegate = _databaseGroupsRequest.ChangeGroupPassword;
+            return await ChangeGroupLogin(changeDelegate, newGroupLogin);
+        }
+
+        private async Task<IActionResult> ChangeGroupLogin(ChangeDelegate changeDelegate, GroupLoginChange newGroupLogin)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            Group group = await _databaseGroupsRequest.FindGroup(newGroupLogin);
+            if (group == null) return new ConflictResult();
+            bool isChanged = await changeDelegate(group, newGroupLogin.NewOption);
+            if (isChanged) return Ok();
+            return new ConflictResult();
         }
     }
 }

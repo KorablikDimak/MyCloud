@@ -16,16 +16,12 @@ namespace MyCloud.Controllers
     public class HomeController : Controller
     {
         private const long MaxMemorySize = 10737418240;
-        private readonly IAdderIntoDatabase _adderIntoDatabase;
-        private readonly IDeleterFromDatabase _deleterFromDatabase;
-        private readonly IFinderFromDatabase _finderFromDatabase;
+        private readonly IDatabaseFilesRequest _databaseFilesRequest;
 
         public HomeController(DataContext context)
         {
             DatabaseRequest databaseRequest = new DatabaseRequest(context);
-            _adderIntoDatabase = databaseRequest;
-            _deleterFromDatabase = databaseRequest;
-            _finderFromDatabase = databaseRequest;
+            _databaseFilesRequest = databaseRequest;
         }
         
         [Authorize]
@@ -57,7 +53,7 @@ namespace MyCloud.Controllers
                         Size = file.Length
                     };
 
-                bool isAdded = await _adderIntoDatabase.AddFileAsync(User.Identity.Name, myFileInfo);
+                bool isAdded = await _databaseFilesRequest.AddFileAsync(User.Identity.Name, myFileInfo);
                 if (isAdded)
                 {
                     await file.CopyToAsync(stream);
@@ -86,7 +82,7 @@ namespace MyCloud.Controllers
         {
             if (User.Identity == null) return null;
             
-            IQueryable<MyFileInfo> files = _finderFromDatabase.FindFiles(User.Identity.Name);
+            IQueryable<MyFileInfo> files = _databaseFilesRequest.FindFiles(User.Identity.Name);
             
             files = sortType.OrderBy switch
             {
@@ -119,7 +115,7 @@ namespace MyCloud.Controllers
         {
             if (User.Identity == null) return new ConflictResult();
             string filepath = Path.Combine($"wwwroot\\data\\{User.Identity.Name}", fileName);
-            bool isDeleted = await _deleterFromDatabase.DeleteFileAsync(User.Identity.Name, fileName);
+            bool isDeleted = await _databaseFilesRequest.DeleteFileAsync(User.Identity.Name, fileName);
             if (!isDeleted) return new ConflictResult();
             System.IO.File.Delete(filepath);
             return Ok();
@@ -131,7 +127,7 @@ namespace MyCloud.Controllers
         {
             if (User.Identity == null) return new ConflictResult();
             
-            bool isDeleted = await _deleterFromDatabase.DeleteAllFilesAsync(User.Identity.Name);
+            bool isDeleted = await _databaseFilesRequest.DeleteAllFilesAsync(User.Identity.Name);
             if (!isDeleted) return new ConflictResult();
             
             var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");

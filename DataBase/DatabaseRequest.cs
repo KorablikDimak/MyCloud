@@ -8,7 +8,7 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabaseRequest : IAdderIntoDatabase, IChangerDataInDatabase, IDeleterFromDatabase, IFinderFromDatabase
+    public class DatabaseRequest : IDatabaseFilesRequest, IDatabasePersonalityRequest, IDatabaseUsersRequest
     {
         private readonly DataContext _databaseContext;
 
@@ -103,7 +103,7 @@ namespace MyCloud.DataBase
             return true;
         }
 
-        public async Task<bool> ChangePersonalityDataAsync(string userName, Personality newPersonality)
+        public async Task<bool> ChangePersonalityAsync(string userName, Personality newPersonality)
         {
             try
             {

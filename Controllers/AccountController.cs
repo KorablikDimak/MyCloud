@@ -16,18 +16,14 @@ namespace MyCloud.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IAdderIntoDatabase _adderIntoDatabase;
-        private readonly IChangerDataInDatabase _changerDataInDatabase;
-        private readonly IDeleterFromDatabase _deleterFromDatabase;
-        private readonly IFinderFromDatabase _finderFromDatabase;
+        private readonly IDatabaseUsersRequest _databaseUsersRequest;
+        private readonly IDatabasePersonalityRequest _databasePersonalityRequest;
 
         public AccountController(DataContext context)
         {
             DatabaseRequest databaseRequest = new DatabaseRequest(context);
-            _adderIntoDatabase = databaseRequest;
-            _changerDataInDatabase = databaseRequest;
-            _deleterFromDatabase = databaseRequest;
-            _finderFromDatabase = databaseRequest;
+            _databaseUsersRequest = databaseRequest;
+            _databasePersonalityRequest = databaseRequest;
         }
         
         [HttpGet]
@@ -41,7 +37,7 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
 
-            var user = await _finderFromDatabase.FindUserAsync(loginModel.UserName, loginModel.Password);
+            var user = await _databaseUsersRequest.FindUserAsync(loginModel.UserName, loginModel.Password);
             if (user == null) return new ForbidResult();
             
             await AuthenticateAsync(loginModel.UserName);
@@ -73,13 +69,13 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
             
-            bool isAdded = await _adderIntoDatabase.AddUserAsync(registrationModel.UserName, registrationModel.Password);
+            bool isAdded = await _databaseUsersRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
             if (!isAdded) return new ConflictResult();
             
             bool isCreated = CreateUserDirectory(registrationModel.UserName);
             if (isCreated) return Ok();
             
-            await _deleterFromDatabase.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
+            await _databaseUsersRequest.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
             return new ConflictResult();
         }
         
@@ -102,7 +98,7 @@ namespace MyCloud.Controllers
         public async Task<Personality> GetPersonality()
         {
             if (User.Identity == null) return new Personality();
-            return await _finderFromDatabase.FindPersonalityAsync(User.Identity.Name);
+            return await _databasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
         }
 
         [Authorize]
@@ -111,7 +107,7 @@ namespace MyCloud.Controllers
         {
             if (User.Identity == null) return new ConflictResult();
             
-            bool isUserNameChanged = await _changerDataInDatabase.ChangeUserNameAsync(User.Identity.Name, newUserName);
+            bool isUserNameChanged = await _databaseUsersRequest.ChangeUserNameAsync(User.Identity.Name, newUserName);
             if (!isUserNameChanged) return new ConflictResult();
             
             bool isDirectoryChanged = ChangeDirectoryName(User.Identity.Name, newUserName);
@@ -142,7 +138,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> ChangePersonality([FromBody] Personality newPersonality)
         {
             if (User.Identity == null) return new ConflictResult();
-            bool isChanged = await _changerDataInDatabase.ChangePersonalityDataAsync(User.Identity.Name, newPersonality);
+            bool isChanged = await _databasePersonalityRequest.ChangePersonalityAsync(User.Identity.Name, newPersonality);
             if (isChanged) return Ok();
             return new ConflictResult();
         }
@@ -152,7 +148,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel passwordModel)
         {
             if (User.Identity == null) return new ConflictResult();
-            bool isChanged = await _changerDataInDatabase.ChangePasswordAsync(
+            bool isChanged = await _databaseUsersRequest.ChangePasswordAsync(
                 User.Identity.Name, 
                 passwordModel.OldPassword, 
                 passwordModel.NewPassword);
@@ -165,7 +161,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> DeleteAccount([FromBody] string password)
         {
             if (User.Identity == null) return new ConflictResult();
-            bool isUserDeleted = await _deleterFromDatabase.DeleteUserAsync(User.Identity.Name, password);
+            bool isUserDeleted = await _databaseUsersRequest.DeleteUserAsync(User.Identity.Name, password);
             if (!isUserDeleted) return new ConflictResult();
             bool isDirectoryDeleted = DeleteUserDirectory(User.Identity.Name);
             if (!isDirectoryDeleted) return new ConflictResult();

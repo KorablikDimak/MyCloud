@@ -10,10 +10,12 @@ namespace MyCloud.Models.User
         public string Password { get; set; }
         public ICollection<MyFileInfo> Files { get; set; }
         public PersonalityData PersonalityData { get; set; }
+        public ICollection<Group> Groups { get; set; }
 
         public User()
         {
             Files = new List<MyFileInfo>();
+            Groups = new List<Group>();
         }
     }
 }

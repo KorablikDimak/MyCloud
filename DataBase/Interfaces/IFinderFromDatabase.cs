@@ -9,5 +9,6 @@ namespace MyCloud.DataBase.Interfaces
     {
         public Task<User> FindUserAsync(string userName, string password);
         public IQueryable<MyFileInfo> FindFiles(string userName);
+        public Task<Personality> FindPersonalityAsync(string userName);
     }
 }

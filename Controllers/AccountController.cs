@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
@@ -71,11 +72,16 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> Registration([FromBody] RegistrationModel registrationModel)
         {
             if (!ModelState.IsValid) return new ForbidResult();
-            if (!CreateUserDirectory(registrationModel.UserName)) return new ConflictResult();
-            bool isAdded = await _adderIntoDatabase.AddUserAsync(registrationModel.UserName, registrationModel.Password);
-            if (!isAdded) return new ConflictResult();
+            bool isCreated = CreateUserDirectory(registrationModel.UserName);
+            if (isCreated)
+            {
+                bool isAdded = await _adderIntoDatabase.AddUserAsync(registrationModel.UserName, registrationModel.Password);
+                if (!isAdded) return new ConflictResult();
+                return Ok();
+            }
 
-            return Ok();
+            DeleteUserDirectory(registrationModel.UserName);
+            return new ConflictResult();
         }
         
         private bool CreateUserDirectory(string userName)
@@ -93,11 +99,51 @@ namespace MyCloud.Controllers
         }
 
         [Authorize]
+        [HttpGet("GetPersonality")]
+        public async Task<Personality> GetPersonality()
+        {
+            if (User.Identity == null) return new Personality();
+            return await _finderFromDatabase.FindPersonalityAsync(User.Identity.Name);
+        }
+
+        [Authorize]
         [HttpPatch("ChangeUserName")]
-        public async Task<IActionResult> ChangePersonality([FromBody] string newUserName, PersonalityData newPersonality)
+        public async Task<IActionResult> ChangeUserName([FromBody] string newUserName)
         {
             if (User.Identity == null) return new ConflictResult();
-            bool isChanged = await _changerDataInDatabase.ChangePersonalityDataAsync(User.Identity.Name, newUserName, newPersonality);
+            
+            bool isUserNameChanged = await _changerDataInDatabase.ChangeUserNameAsync(User.Identity.Name, newUserName);
+            if (!isUserNameChanged) return new ConflictResult();
+            
+            bool isDirectoryChanged = ChangeDirectoryName(User.Identity.Name, newUserName);
+            if (!isDirectoryChanged) return new ConflictResult();
+            
+            return Ok();
+        }
+
+        private bool ChangeDirectoryName(string oldUserName, string newUserName)
+        {
+            try
+            {
+                var directoryInfo = new DirectoryInfo($"wwwroot\\data\\{oldUserName}");
+                if (!directoryInfo.Exists) return false;
+                directoryInfo.MoveTo($"wwwroot\\data\\{newUserName}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
+        }
+
+        [Authorize]
+        [HttpPatch("ChangePersonality")]
+        public async Task<IActionResult> ChangePersonality([FromBody] Personality newPersonality)
+        {
+            if (User.Identity == null) return new ConflictResult();
+            bool isChanged = await _changerDataInDatabase.ChangePersonalityDataAsync(User.Identity.Name, newPersonality);
             if (isChanged) return Ok();
             return new ConflictResult();
         }
@@ -117,22 +163,30 @@ namespace MyCloud.Controllers
         
         [Authorize]
         [HttpDelete("DeleteAccount")]
-        public async Task<IActionResult> DeleteAccount([FromBody] LoginModel loginModel)
+        public async Task<IActionResult> DeleteAccount([FromBody] string password)
         {
             if (User.Identity == null) return new ConflictResult();
-            bool isDeleted = await _deleterFromDatabase.DeleteUserAsync(loginModel.UserName, loginModel.Password);
-            if (!isDeleted) return new ConflictResult();
-            if (!DeleteUserDirectory(User.Identity.Name)) return new ConflictResult();
+            bool isUserDeleted = await _deleterFromDatabase.DeleteUserAsync(User.Identity.Name, password);
+            if (!isUserDeleted) return new ConflictResult();
+            bool isDirectoryDeleted = DeleteUserDirectory(User.Identity.Name);
+            if (!isDirectoryDeleted) return new ConflictResult();
             return Ok();
         }
 
         private bool DeleteUserDirectory(string userName)
         {
-            var directoryInfo = new DirectoryInfo($"~\\data\\{userName}");
-
-            if (!directoryInfo.Exists) return false;
+            try
+            {
+                var directoryInfo = new DirectoryInfo($"wwwroot\\data\\{userName}");
+                if (!directoryInfo.Exists) return false;
+                directoryInfo.Delete();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
             
-            directoryInfo.Delete();
             return true;
         }
     }

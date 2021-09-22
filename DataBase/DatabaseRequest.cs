@@ -31,11 +31,19 @@ namespace MyCloud.DataBase
             {
                 User user = await FindUserAsync(userName, password);
                 if (user != null) return false;
-                await _databaseContext.Users.AddAsync(new User 
-                { 
-                    UserName = userName, 
+                user = new User
+                {
+                    UserName = userName,
                     Password = password
-                });
+                };
+                await _databaseContext.Users.AddAsync(user);
+                await _databaseContext.SaveChangesAsync();
+                var personality = new PersonalityData
+                {
+                    Id = user.Id,
+                    UserName = user.UserName
+                };
+                await _databaseContext.Personality.AddAsync(personality);
                 await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)
@@ -65,15 +73,44 @@ namespace MyCloud.DataBase
             return true;
         }
 
-        public async Task<bool> ChangePersonalityDataAsync(string oldUserName, string newUserName, PersonalityData newPersonality)
+        public async Task<Personality> FindPersonalityAsync(string userName)
+        {
+            Personality personality = await _databaseContext.Personality.FirstOrDefaultAsync(personalityData => 
+                personalityData.User.UserName == userName);
+            return personality;
+        }
+
+        public async Task<bool> ChangeUserNameAsync(string oldUserName, string newUserName)
         {
             try
             {
+                if (await FindUserAsync(newUserName) != null) return false;
+                
                 User user = await FindUserAsync(oldUserName);
-                if (user == null) return false;
+                Personality personality = await FindPersonalityAsync(oldUserName);
+                
+                if (user == null || personality == null) return false;
                 user.UserName = newUserName;
-                user.PersonalityData.Name = newPersonality.Name;
-                user.PersonalityData.Surname = newPersonality.Surname;
+                personality.UserName = newUserName;
+                await _databaseContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> ChangePersonalityDataAsync(string userName, Personality newPersonality)
+        {
+            try
+            {
+                Personality personality = await FindPersonalityAsync(userName);
+                if (personality == null) return false;
+                personality.Name = newPersonality.Name;
+                personality.Surname = newPersonality.Surname;
                 await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)
@@ -121,7 +158,7 @@ namespace MyCloud.DataBase
 
             return true;
         }
-        
+
         private async Task<User> FindUserAsync(string userName)
         {
             User user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>

@@ -19,7 +19,7 @@ body {
     background-color: rgba(113,113,113,0.49);
 }
 
-.change-password-window {
+.change-window {
     position: fixed;
     top: 0;
     left: 0;
@@ -34,18 +34,27 @@ body {
     transition: all 0.3s ease-in-out;
 }
 
-.container.highlight .change-password-window {
+#change-password-window.highlight {
     opacity: 1;
     z-index: 1;
 }
 
-.change-password-container {
+#change-personality-window.highlight {
+    opacity: 1;
+    z-index: 1;
+}
+
+.change-container {
     z-index: -1;
     border-radius: 15px;
     margin: 25% 25%;
 }
 
-.container.highlight .change-password-container {
+#change-password-window.highlight .change-container {
+    background-color: #f1f1f1;
+}
+
+#change-personality-window.highlight .change-container {
     background-color: #f1f1f1;
 }
 

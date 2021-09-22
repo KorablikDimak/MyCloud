@@ -9,8 +9,22 @@
     </head>
     <body>
         <div class="container" id="container">
-            <div class="change-password-window" id="change-password-window">
-                <div class="change-password-container">
+            <div class="change-window" id="change-personality-window">
+                <div class="change-container">
+                    <div class="input-container">
+                        <input class="input" id="surname-input" placeholder="Фамилия"/>
+                    </div>
+                    <div class="input-container">
+                        <input class="input" id="name-input" placeholder="Имя"/>
+                    </div>
+                    <div class="input-container">
+                         <input class="input" id="username-input" placeholder="UserName"/>
+                    </div>
+                    <div class="confirm" id="confirm-personality">Подтвердить</div>
+                </div>
+            </div>
+            <div class="change-window" id="change-password-window">
+                <div class="change-container">
                     <div class="input-container">
                         <input class="input" id="old-password" placeholder="Старый пароль"/>
                     </div>
@@ -34,7 +48,7 @@
                 <div class="personality-data" id="username">UserName</div>
                 <div class="personality-data" id="change-data">Изменить персональные данные</div>
                 <hr class="line"/>
-                <div class="personality-data" id="id">Id</div>
+                <div class="personality-data" id="id">1</div>
             </div>
             <div class="right-container">
                 <div class="button" id="my-files">Мои файлы</div>
@@ -44,6 +58,7 @@
             </div>
         </div>
         <script src="~/js/sendMessage.js"></script>
+        <script src="~/js/Account/updatePage.js"></script>
         <script src="~/js/Account/profile.js"></script>
     </body>
 </html>

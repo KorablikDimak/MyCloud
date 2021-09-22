@@ -1,55 +1,126 @@
-let changePhoto = document.getElementById("change-photo");
-changePhoto.addEventListener("click", ev => {
-    //TODO open manager for photo
-});
+let container = document.getElementById("container");
+initPage();
 
-let changeData = document.getElementById("change-data");
-changeData.addEventListener("click", ev => {
-    //TODO change data
-});
+function initPage() {
+    initChangePhoto();
+    initChangePersonality();
+    initMyFilesButton();
+    initGroupsViewButton();
+    initChangePassword();
+    initDeleteAccountButton();
+    updatePage().then();
+}
 
-let myFiles = document.getElementById("my-files");
-myFiles.addEventListener("click", ev => {
-    window.location = "https://localhost:5001/Home/MyFiles";
-});
-
-let groupsView = document.getElementById("groups-view");
-groupsView.addEventListener("click", ev => {
-    //TODO groups
-});
-
-let confirmButton = document.getElementById("confirm");
-confirmButton.addEventListener("click", ev => {
-    let message = {
-        OldPassword: document.getElementById("old-password").value,
-        NewPassword: document.getElementById("new-password").value
-    };
-    sendJsonMessage("https://localhost:5001/ChangePassword", 'PATCH', message).then(response => {
-        if (response.status === 200) logout().then();
+function initChangePhoto() {
+    let changePhoto = document.getElementById("change-photo");
+    changePhoto.addEventListener("click", () => {
+        //TODO open manager for photo
     });
-});
+}
 
-let changePassword = document.getElementById("password-change");
-changePassword.addEventListener("click", ev => {
-    let container = document.getElementById("container");
-    container.classList.add('highlight');
-});
+function initChangePersonality() {
+    let confirmButton = document.getElementById("confirm-personality");
+    let changePersonalityWindow = document.getElementById("change-personality-window");
+    let changeData = document.getElementById("change-data");
+    
+    confirmButton.addEventListener("click", () => {
+        changePersonality().then(() => {
+            changePersonalityWindow.classList.remove('highlight');
+            container.classList.remove('highlight');
+            updatePage().then();
+        });
+    });
+    
+    changePersonalityWindow.addEventListener("click", ev => {
+        const target = ev.target;
+        if (target === changePersonalityWindow) {
+            changePersonalityWindow.classList.remove('highlight');
+            container.classList.remove('highlight');
+        }
+    });
+    
+    changeData.addEventListener("click", () => {
+        changePersonalityWindow.classList.add('highlight');
+        container.classList.add('highlight');
+    });
+}
 
-let changePasswordWindow = document.getElementById("change-password-window");
-changePasswordWindow.addEventListener("click", ev => {
-    const target = ev.target;
-    if (target === changePasswordWindow) {
-        let container = document.getElementById("container");
-        container.classList.remove('highlight');
+async function changePersonality() {
+    let message = {
+        Id: 0,
+        UserName: "",
+        Surname: document.getElementById("surname-input").value,
+        Name: document.getElementById("name-input").value,
     }
-});
+    let response = await sendJsonMessage("https://localhost:5001/ChangePersonality", 'PATCH', message)
+    if (response.status === 200) {
+        await changeUserName();
+    }
+}
 
-let deleteAccount = document.getElementById("delete-account");
-deleteAccount.addEventListener("click", ev => {
-    if (confirm("Вы уверены, что хотите удалить свой аккаунт вместе со всеми файлами?\n" +
-        "Восстановить аккаунт будет невозможно.")) {
-        sendJsonMessage("https://localhost:5001/DeleteAccount", "DELETE").then(response => {
+async function changeUserName() {
+    let message = document.getElementById("username-input").value;
+    let userName = document.getElementById("username").value;
+    if (message !== userName) {
+        let response = await sendJsonMessage("https://localhost:5001/ChangeUserName", 'PATCH', message);
+        if (response.status === 200) {
+            await logout();
+        }
+    }
+}
+
+function initMyFilesButton() {
+    let myFiles = document.getElementById("my-files");
+    myFiles.addEventListener("click", () => {
+        window.location = "https://localhost:5001/Home/MyFiles";
+    });
+}
+
+function initGroupsViewButton() {
+    let groupsView = document.getElementById("groups-view");
+    groupsView.addEventListener("click", () => {
+        //TODO groups
+    });
+}
+
+function initChangePassword() {
+    let confirmButton = document.getElementById("confirm");
+    let changePasswordWindow = document.getElementById("change-password-window");
+    let changePassword = document.getElementById("password-change");
+    
+    confirmButton.addEventListener("click", () => {
+        let message = {
+            OldPassword: document.getElementById("old-password").value,
+            NewPassword: document.getElementById("new-password").value
+        };
+        sendJsonMessage("https://localhost:5001/ChangePassword", 'PATCH', message).then(response => {
             if (response.status === 200) logout().then();
         });
-    }
-});
+    });
+    
+    changePasswordWindow.addEventListener("click", ev => {
+        const target = ev.target;
+        if (target === changePasswordWindow) {
+            changePasswordWindow.classList.remove('highlight');
+            container.classList.remove('highlight');
+        }
+    });
+    
+    changePassword.addEventListener("click", () => {
+        changePasswordWindow.classList.add('highlight');
+        container.classList.add('highlight');
+    });
+}
+
+function initDeleteAccountButton() {
+    let deleteAccount = document.getElementById("delete-account");
+    deleteAccount.addEventListener("click", () => {
+        if (confirm("Вы уверены, что хотите удалить свой аккаунт вместе со всеми файлами?\n" +
+            "Восстановить аккаунт будет невозможно.")) {
+            let message; //TODO message
+            sendJsonMessage("https://localhost:5001/DeleteAccount", "DELETE", "Cratos_1990").then(response => {
+                if (response.status === 200) logout().then();
+            });
+        }
+    });
+}

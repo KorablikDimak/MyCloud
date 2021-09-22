@@ -44,6 +44,11 @@ body {
     z-index: 1;
 }
 
+#delete-account-window.highlight {
+    opacity: 1;
+    z-index: 1;
+}
+
 .change-container {
     z-index: -1;
     border-radius: 15px;
@@ -55,6 +60,10 @@ body {
 }
 
 #change-personality-window.highlight .change-container {
+    background-color: #f1f1f1;
+}
+
+#delete-account-window.highlight .change-container {
     background-color: #f1f1f1;
 }
 

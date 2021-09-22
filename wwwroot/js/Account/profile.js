@@ -113,14 +113,30 @@ function initChangePassword() {
 }
 
 function initDeleteAccountButton() {
-    let deleteAccount = document.getElementById("delete-account");
-    deleteAccount.addEventListener("click", () => {
-        if (confirm("Вы уверены, что хотите удалить свой аккаунт вместе со всеми файлами?\n" +
-            "Восстановить аккаунт будет невозможно.")) {
-            let message; //TODO message
-            sendJsonMessage("https://localhost:5001/DeleteAccount", "DELETE", "Cratos_1990").then(response => {
-                if (response.status === 200) logout().then();
-            });
+    let deleteAccountButton = document.getElementById("delete-account");
+    let deleteAccountWindow = document.getElementById("delete-account-window");
+    let confirm = document.getElementById("confirm-delete");
+
+    deleteAccountButton.addEventListener("click", () => {
+        deleteAccountWindow.classList.add('highlight');
+        container.classList.add('highlight');
+    });
+
+    deleteAccountWindow.addEventListener("click", ev => {
+        const target = ev.target;
+        if (target === deleteAccountWindow) {
+            deleteAccountWindow.classList.remove('highlight');
+            container.classList.remove('highlight');
         }
     });
+    
+    confirm.addEventListener("click", () => {
+        deleteAccount().then();
+    });
+}
+
+async function deleteAccount() {
+    let message = document.getElementById("password-delete-input").value;
+    let response = await sendJsonMessage("https://localhost:5001/DeleteAccount", "DELETE", message)
+    if (response.status === 200) await logout();
 }

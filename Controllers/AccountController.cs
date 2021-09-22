@@ -72,15 +72,14 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> Registration([FromBody] RegistrationModel registrationModel)
         {
             if (!ModelState.IsValid) return new ForbidResult();
+            
+            bool isAdded = await _adderIntoDatabase.AddUserAsync(registrationModel.UserName, registrationModel.Password);
+            if (!isAdded) return new ConflictResult();
+            
             bool isCreated = CreateUserDirectory(registrationModel.UserName);
-            if (isCreated)
-            {
-                bool isAdded = await _adderIntoDatabase.AddUserAsync(registrationModel.UserName, registrationModel.Password);
-                if (!isAdded) return new ConflictResult();
-                return Ok();
-            }
-
-            DeleteUserDirectory(registrationModel.UserName);
+            if (isCreated) return Ok();
+            
+            await _deleterFromDatabase.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
             return new ConflictResult();
         }
         

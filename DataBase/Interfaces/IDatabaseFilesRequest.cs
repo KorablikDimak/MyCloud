@@ -7,6 +7,7 @@ namespace MyCloud.DataBase.Interfaces
 {
     public interface IDatabaseFilesRequest
     {
+        public DataContext DatabaseContext { init; }
         public IQueryable<MyFileInfo> FindFiles(string userName);
         public Task<bool> AddFileAsync(User user, MyFileInfo fileInfo);
         public Task<bool> DeleteFileAsync(string userName, string fileName);

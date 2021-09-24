@@ -68,6 +68,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> Registration([FromBody] RegistrationModel registrationModel)
         {
             if (!ModelState.IsValid) return new ForbidResult();
+            if (registrationModel.Password != registrationModel.ConfirmPassword) return new ConflictResult();
             
             bool isAdded = await _databaseUsersRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
             if (!isAdded) return new ConflictResult();

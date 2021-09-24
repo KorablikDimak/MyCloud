@@ -10,20 +10,15 @@ namespace MyCloud.DataBase
 {
     public class DatabaseFilesRequest : IDatabaseFilesRequest
     {
-        private readonly DataContext _databaseContext;
+        public DataContext DatabaseContext { private get; init; }
 
-        public DatabaseFilesRequest(DataContext databaseContext)
-        {
-            _databaseContext = databaseContext;
-        }
-        
         public async Task<bool> AddFileAsync(User user, MyFileInfo fileInfo)
         {
             try
             {
                 fileInfo.User = user;
-                await _databaseContext.Files.AddAsync(fileInfo);
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.Files.AddAsync(fileInfo);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -36,7 +31,7 @@ namespace MyCloud.DataBase
         
         public IQueryable<MyFileInfo> FindFiles(string userName)
         {
-            IQueryable<MyFileInfo> files = _databaseContext.Files.Where(file => file.User.UserName == userName);
+            IQueryable<MyFileInfo> files = DatabaseContext.Files.Where(file => file.User.UserName == userName);
             return files;
         }
         
@@ -44,12 +39,12 @@ namespace MyCloud.DataBase
         {
             try
             {
-                MyFileInfo fileInfo = await _databaseContext.Files.FirstOrDefaultAsync(file => 
+                MyFileInfo fileInfo = await DatabaseContext.Files.FirstOrDefaultAsync(file => 
                     file.Name == fileName &&
                     file.User.UserName == userName);
                 if (fileInfo == null) return false;
-                _databaseContext.Files.Remove(fileInfo);
-                await _databaseContext.SaveChangesAsync();
+                DatabaseContext.Files.Remove(fileInfo);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -64,8 +59,8 @@ namespace MyCloud.DataBase
         {
             try
             {
-                _databaseContext.Files.RemoveRange(FindFiles(userName));
-                await _databaseContext.SaveChangesAsync();
+                DatabaseContext.Files.RemoveRange(FindFiles(userName));
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {

@@ -6,6 +6,7 @@ namespace MyCloud.DataBase.Interfaces
 {
     public interface IDatabaseUsersRequest
     {
+        public DataContext DatabaseContext { init; }
         Task<List<User>> FindUsersInGroup(GroupLogin groupLogin);
         public Task<User> FindUserAsync(string userName);
         public Task<User> FindUserAsync(string userName, string password);

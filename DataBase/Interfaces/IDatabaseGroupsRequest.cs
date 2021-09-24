@@ -6,6 +6,7 @@ namespace MyCloud.DataBase.Interfaces
 {
     public interface IDatabaseGroupsRequest
     {
+        public DataContext DatabaseContext { init; }
         Task<List<Group>> FindGroupsInUser(string userName);
         Task<bool> CreateGroupAsync(GroupLogin groupLogin, User user);
         Task<bool> DeleteGroupAsync(GroupLogin groupLogin);

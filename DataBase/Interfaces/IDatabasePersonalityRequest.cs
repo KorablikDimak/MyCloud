@@ -5,6 +5,7 @@ namespace MyCloud.DataBase.Interfaces
 {
     public interface IDatabasePersonalityRequest
     {
+        public DataContext DatabaseContext { init; }
         public Task<Personality> FindPersonalityAsync(string userName);
         public Task<bool> ChangePersonalityAsync(string userName, Personality newPersonality);
     }

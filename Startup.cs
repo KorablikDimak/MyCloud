@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using MyCloud.DataBase;
+using MyCloud.DataBase.Interfaces;
 
 namespace MyCloud
 {
@@ -30,11 +31,11 @@ namespace MyCloud
             
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
-
-            services.AddUserRequest();
-            services.AddGroupsRequest();
-            services.AddFilesRequest();
-            services.AddPersonalityRequest();
+            
+            services.AddUserRequest<DatabaseUsersRequest>();
+            services.AddGroupsRequest<DatabaseGroupsRequest>();
+            services.AddFilesRequest<DatabaseFilesRequest>();
+            services.AddPersonalityRequest<DatabasePersonalityRequest>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

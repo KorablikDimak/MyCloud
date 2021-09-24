@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MyCloud.DataBase;
 using MyCloud.DataBase.Interfaces;
 using MyCloud.Models.MyFile;
+using MyCloud.Models.User;
 
 namespace MyCloud.Controllers
 {
@@ -17,11 +17,12 @@ namespace MyCloud.Controllers
     {
         private const long MaxMemorySize = 10737418240;
         private readonly IDatabaseFilesRequest _databaseFilesRequest;
+        private readonly IDatabaseUsersRequest _databaseUsersRequest;
 
-        public HomeController(DataContext context)
+        public HomeController(IDatabaseFilesRequest databaseFilesRequest, IDatabaseUsersRequest databaseUsersRequest)
         {
-            DatabaseRequest databaseRequest = new DatabaseRequest(context);
-            _databaseFilesRequest = databaseRequest;
+            _databaseFilesRequest = databaseFilesRequest;
+            _databaseUsersRequest = databaseUsersRequest;
         }
         
         [Authorize]
@@ -39,8 +40,11 @@ namespace MyCloud.Controllers
             foreach (var file in files) 
             {
                 if (User.Identity == null) return new ConflictResult();
+                
                 string untrustedFileName = Path.GetFileName(file.FileName);
-                string filePath = $"wwwroot\\data\\{User.Identity.Name}\\{untrustedFileName}";
+                string filePath = $"UserFiles\\{User.Identity.Name}\\{untrustedFileName}";
+                if (System.IO.File.Exists(filePath)) return new ConflictResult();
+                
                 await using var stream = System.IO.File.Create(filePath);
                 if (!IsMemoryFree(file.Length)) return new ConflictResult();
                 
@@ -53,7 +57,9 @@ namespace MyCloud.Controllers
                         Size = file.Length
                     };
 
-                bool isAdded = await _databaseFilesRequest.AddFileAsync(User.Identity.Name, myFileInfo);
+                User user = await _databaseUsersRequest.FindUserAsync(User.Identity.Name);
+                if (user == null) return new ConflictResult();
+                bool isAdded = await _databaseFilesRequest.AddFileAsync(user, myFileInfo);
                 if (isAdded)
                 {
                     await file.CopyToAsync(stream);
@@ -72,7 +78,7 @@ namespace MyCloud.Controllers
         private bool IsMemoryFree(long fileSize)
         {
             if (User.Identity == null) return false;
-            var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
+            var dirInfo = new DirectoryInfo($"UserFiles\\{User.Identity.Name}");
             return dirInfo.GetFiles().Sum(file => file.Length) + fileSize <= MaxMemorySize;
         }
 
@@ -105,7 +111,7 @@ namespace MyCloud.Controllers
         public VirtualFileResult GetVirtualFile([FromBody] string fileName)
         {
             if (User.Identity == null) return null;
-            string filepath = Path.Combine($"~/data/{User.Identity.Name}", fileName);
+            string filepath = Path.Combine($"~/UserFiles/{User.Identity.Name}", fileName);
             return File(filepath, "application/octet-stream", fileName);
         }
 
@@ -114,7 +120,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> DeleteOneFile([FromBody] string fileName)
         {
             if (User.Identity == null) return new ConflictResult();
-            string filepath = Path.Combine($"wwwroot\\data\\{User.Identity.Name}", fileName);
+            string filepath = Path.Combine($"UserFiles\\{User.Identity.Name}", fileName);
             bool isDeleted = await _databaseFilesRequest.DeleteFileAsync(User.Identity.Name, fileName);
             if (!isDeleted) return new ConflictResult();
             System.IO.File.Delete(filepath);
@@ -130,7 +136,7 @@ namespace MyCloud.Controllers
             bool isDeleted = await _databaseFilesRequest.DeleteAllFilesAsync(User.Identity.Name);
             if (!isDeleted) return new ConflictResult();
             
-            var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
+            var dirInfo = new DirectoryInfo($"UserFiles\\{User.Identity.Name}");
             foreach (var file in dirInfo.GetFiles())
             {
                 file.Delete();
@@ -144,7 +150,7 @@ namespace MyCloud.Controllers
         public long GetMemorySize()
         {
             if (User.Identity == null) return 0;
-            var dirInfo = new DirectoryInfo($"wwwroot\\data\\{User.Identity.Name}");
+            var dirInfo = new DirectoryInfo($"UserFiles\\{User.Identity.Name}");
             return dirInfo.GetFiles().Sum(file => file.Length);
         }
         

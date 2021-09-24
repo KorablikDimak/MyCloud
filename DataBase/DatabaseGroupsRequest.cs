@@ -6,11 +6,11 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabaseGroupRequest : IDatabaseGroupsRequest
+    public class DatabaseGroupsRequest : IDatabaseGroupsRequest
     {
         private readonly DataContext _databaseContext;
 
-        public DatabaseGroupRequest(DataContext context)
+        public DatabaseGroupsRequest(DataContext context)
         {
             _databaseContext = context;
         }

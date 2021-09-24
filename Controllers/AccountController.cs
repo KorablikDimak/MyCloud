@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyCloud.DataBase;
 using MyCloud.DataBase.Interfaces;
 using MyCloud.Models.Login;
 using MyCloud.Models.User;
@@ -21,13 +20,11 @@ namespace MyCloud.Controllers
         private readonly IDatabaseGroupsRequest _databaseGroupsRequest;
         private delegate Task<bool> ChangeDelegate(Group group, string newOption);
 
-        public AccountController(DataContext context)
+        public AccountController(IDatabaseUsersRequest databaseUsersRequest, IDatabasePersonalityRequest databasePersonalityRequest, IDatabaseGroupsRequest databaseGroupsRequest)
         {
-            DatabaseRequest databaseRequest = new DatabaseRequest(context);
-            DatabaseGroupRequest databaseGroupRequest = new DatabaseGroupRequest(context);
-            _databaseUsersRequest = databaseRequest;
-            _databasePersonalityRequest = databaseRequest;
-            _databaseGroupsRequest = databaseGroupRequest;
+            _databaseUsersRequest = databaseUsersRequest;
+            _databasePersonalityRequest = databasePersonalityRequest;
+            _databaseGroupsRequest = databaseGroupsRequest;
         }
         
         [HttpGet]
@@ -85,8 +82,8 @@ namespace MyCloud.Controllers
         
         private bool CreateUserDirectory(string userName)
         {
-            if (Directory.Exists($"wwwroot\\data\\{userName}")) return false;
-            Directory.CreateDirectory($"wwwroot\\data\\{userName}");
+            if (Directory.Exists($"UserFiles\\{userName}")) return false;
+            Directory.CreateDirectory($"UserFiles\\{userName}");
             return true;
         }
 
@@ -110,8 +107,11 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> ChangeUserName([FromBody] string newUserName)
         {
             if (User.Identity == null) return new ConflictResult();
+
+            Personality personality = await _databasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
+            if (personality == null) return new ConflictResult();
             
-            bool isUserNameChanged = await _databaseUsersRequest.ChangeUserNameAsync(User.Identity.Name, newUserName);
+            bool isUserNameChanged = await _databaseUsersRequest.ChangeUserNameAsync(personality, newUserName);
             if (!isUserNameChanged) return new ConflictResult();
             
             bool isDirectoryChanged = ChangeDirectoryName(User.Identity.Name, newUserName);
@@ -124,9 +124,9 @@ namespace MyCloud.Controllers
         {
             try
             {
-                var directoryInfo = new DirectoryInfo($"wwwroot\\data\\{oldUserName}");
+                var directoryInfo = new DirectoryInfo($"UserFiles\\{oldUserName}");
                 if (!directoryInfo.Exists) return false;
-                directoryInfo.MoveTo($"wwwroot\\data\\{newUserName}");
+                directoryInfo.MoveTo($"UserFiles\\{newUserName}");
             }
             catch (Exception e)
             {
@@ -176,7 +176,7 @@ namespace MyCloud.Controllers
         {
             try
             {
-                var directoryInfo = new DirectoryInfo($"wwwroot\\data\\{userName}");
+                var directoryInfo = new DirectoryInfo($"UserFiles\\{userName}");
                 if (!directoryInfo.Exists) return false;
                 directoryInfo.Delete();
             }
@@ -187,6 +187,13 @@ namespace MyCloud.Controllers
             }
             
             return true;
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult MyGroups()
+        {
+            return View();
         }
 
         [Authorize]

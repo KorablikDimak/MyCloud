@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using MyCloud.DataBase;
-using MyCloud.DataBase.Interfaces;
 
 namespace MyCloud
 {
@@ -21,6 +21,13 @@ namespace MyCloud
         
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(60);
+            });
+            
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
 
@@ -39,20 +46,24 @@ namespace MyCloud
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseHttpsRedirection();
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseStaticFiles();
-
+            else
+            {
+                app.UseHsts();
+            }
+            
+            app.UseHttpsRedirection();
+            
             app.UseRouting();
             
             app.UseAuthentication();
             
             app.UseAuthorization();
+
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {

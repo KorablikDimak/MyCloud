@@ -68,8 +68,8 @@ function updateButtons(name) {
     let loadButton = document.getElementById(`load-this-${name}`);
     let deleteButton = document.getElementById(`delete-this-${name}`);
 
-    loadButton.addEventListener("click", ev => loadFileByClick(name));
-    deleteButton.addEventListener("click", ev => deleteOneFile(name));
+    loadButton.addEventListener("click", () => loadFileByClick(name));
+    deleteButton.addEventListener("click", () => deleteOneFile(name));
 }
 
 function createCurrentFileName(fileName, typeOfFile) {

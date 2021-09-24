@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyCloud.Models.User;
 
@@ -5,6 +6,7 @@ namespace MyCloud.DataBase.Interfaces
 {
     public interface IDatabaseUsersRequest
     {
+        Task<List<User>> FindUsersInGroup(GroupLogin groupLogin);
         public Task<User> FindUserAsync(string userName);
         public Task<User> FindUserAsync(string userName, string password);
         public Task<bool> AddUserAsync(string userName, string password);

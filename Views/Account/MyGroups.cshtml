@@ -8,8 +8,48 @@
         <link rel="stylesheet" href="~/css/groups-style.css"/>
     </head>
     <body>
-        <div class="container">
-            
+        <div class="container" id="container">
+            <div class="group-window" id="group-window">
+                <div class="group-container" id="group-container">
+                    <div class="input-container">
+                        <input class="input" id="group-name" placeholder="Название группы"/>
+                    </div>
+                    <div class="input-container">
+                        <input class="input" id="group-password" placeholder="Пароль группы"/>
+                    </div>
+                    <div class="confirm" id="confirm-change">Подтвердить</div>
+                    <div class="confirm" id="confirm-create">Подтвердить</div>
+                    <div class="confirm" id="confirm-delete">Подтвердить</div>
+                    <div class="confirm" id="confirm-enter">Подтвердить</div>
+                </div>
+            </div>
+            <div class="left-container">
+                <p class="header">Участники группы:</p>
+                <div class="users" id="users"></div>
+            </div>
+            <div class="center-container">
+                <p class="header">Мои группы:</p>
+                <div class="groups" id="groups"></div>
+            </div>
+            <div class="right-container">
+                <div class="groups-info">
+                    <div>
+                        <p class="groups-info-text">Название:</p>
+                        <p class="groups-info-text" id="groups-name-text"></p>
+                    </div>
+                    <div class="vertical-line"></div>
+                    <div>
+                        <p class="groups-info-text">Пароль:</p>
+                        <p class="groups-info-text" id="groups-password-text"></p>
+                    </div>
+                </div>
+                <div class="button" id="change-group">Изменить</div>
+                <div class="button" id="delete-group">Удалить</div>
+                <div class="button" id="leave-group">Покинуть</div>
+                <hr class="horizontal-line"/>
+                <div class="button" id="enter-group">Вступить</div>
+                <div class="button" id="create-group">Создать</div>
+            </div>
         </div>
         <script src="~/js/sendMessage.js"></script>
         <script src="~/js/Account/myGroups.js"></script>

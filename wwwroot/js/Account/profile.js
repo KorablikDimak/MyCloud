@@ -79,7 +79,7 @@ function initMyFilesButton() {
 function initGroupsViewButton() {
     let groupsView = document.getElementById("groups-view");
     groupsView.addEventListener("click", () => {
-        //TODO groups
+        window.location = "https://localhost:5001/Account/MyGroups";
     });
 }
 

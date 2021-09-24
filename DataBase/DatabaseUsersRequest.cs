@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MyCloud.DataBase.Interfaces;
@@ -13,6 +15,15 @@ namespace MyCloud.DataBase
         public DatabaseUsersRequest(DataContext databaseContext)
         {
             _databaseContext = databaseContext;
+        }
+        
+        public async Task<List<User>> FindUsersInGroup(GroupLogin groupLogin)
+        {
+            Group currentGroup = await _databaseContext.Groups
+                .Include(group => group.Users)
+                .FirstOrDefaultAsync(group => group.GroupName == groupLogin.GroupName && 
+                                              group.GroupPassword == groupLogin.GroupPassword);
+            return currentGroup?.Users.ToList();
         }
         
         public async Task<User> FindUserAsync(string userName)

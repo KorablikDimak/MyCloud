@@ -5,10 +5,10 @@ let fileInfoBody = {
 
 let showType = showFileTable;
 
-async function updatePage() {
+function updatePage() {
     clearFileContainer();
-    await updateFileContainer();
-    await showFreeMemory();
+    updateFileContainer().then();
+    showFreeMemory().then();
 }
 
 function clearFileContainer() {
@@ -21,7 +21,9 @@ async function loadFileInfo() {
         orderBy: fileInfoBody.orderBy,
         typeOfSort: fileInfoBody.typeOfSort
     }
+    console.log(message);
     let response = await sendJsonMessage("https://localhost:5001/GetFileInfo", 'POST', message);
+    console.log(response);
     return await response.json();
 }
 

@@ -10,11 +10,16 @@ namespace MyCloud.DataBase
 {
     public class DatabaseUsersRequest : IDatabaseUsersRequest
     {
-        public DataContext DatabaseContext { private get; init; }
+        private readonly DataContext _databaseContext;
+
+        public DatabaseUsersRequest(DataContext context)
+        {
+            _databaseContext = context;
+        }
 
         public async Task<List<User>> FindUsersInGroup(GroupLogin groupLogin)
         {
-            Group currentGroup = await DatabaseContext.Groups
+            Group currentGroup = await _databaseContext.Groups
                 .Include(group => group.Users)
                 .FirstOrDefaultAsync(group => group.GroupName == groupLogin.GroupName && 
                                               group.GroupPassword == groupLogin.GroupPassword);
@@ -23,14 +28,14 @@ namespace MyCloud.DataBase
         
         public async Task<User> FindUserAsync(string userName)
         {
-            User user = await DatabaseContext.Users.FirstOrDefaultAsync(userData =>
+            User user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == userName);
             return user;
         }
         
         public async Task<User> FindUserAsync(string userName, string password)
         {
-            User user = await DatabaseContext.Users.FirstOrDefaultAsync(userData =>
+            User user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == userName && 
                 userData.Password == password);
             return user;
@@ -47,15 +52,15 @@ namespace MyCloud.DataBase
                     UserName = userName,
                     Password = password
                 };
-                await DatabaseContext.Users.AddAsync(user);
-                await DatabaseContext.SaveChangesAsync();
+                await _databaseContext.Users.AddAsync(user);
+                await _databaseContext.SaveChangesAsync();
                 var personality = new PersonalityData
                 {
                     Id = user.Id,
                     UserName = user.UserName
                 };
-                await DatabaseContext.Personality.AddAsync(personality);
-                await DatabaseContext.SaveChangesAsync();
+                await _databaseContext.Personality.AddAsync(personality);
+                await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -72,8 +77,8 @@ namespace MyCloud.DataBase
             {
                 User user = await FindUserAsync(userName, password);
                 if (user == null) return false;
-                DatabaseContext.Users.Remove(user);
-                await DatabaseContext.SaveChangesAsync();
+                _databaseContext.Users.Remove(user);
+                await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -91,7 +96,7 @@ namespace MyCloud.DataBase
                 User user = await FindUserAsync(userName, oldPassword);
                 if (user == null) return false;
                 user.Password = newPassword;
-                await DatabaseContext.SaveChangesAsync();
+                await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -113,7 +118,7 @@ namespace MyCloud.DataBase
                 
                 user.UserName = newUserName;
                 personality.UserName = newUserName;
-                await DatabaseContext.SaveChangesAsync();
+                await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {

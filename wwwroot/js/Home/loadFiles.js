@@ -3,7 +3,7 @@ async function sendFile(formData) {
         method: 'POST',
         body: formData
     }
-    await fetch("https://localhost:5001/LoadFile", init);
+    await fetch("https://localhost:5001/LoadFiles", init);
 }
 
 async function uploadFile(file) {
@@ -44,19 +44,19 @@ async function loadFileByClick(name) {
     document.body.appendChild(dummy);
     dummy.click();
     
-    updatePage().then();
+    updatePage();
 }
 
 async function deleteOneFile(name) {
     if (confirm("Вы уверены, что хотите удалить файл?")) {
         await sendJsonMessage("https://localhost:5001/DeleteOneFile", 'DELETE', name)
-        updatePage().then();
+        updatePage();
     }
 }
 
 async function deleteAllFiles() {
     if (confirm("Вы уверены, что хотите удалить все файлы?")) {
         await sendJsonMessage("https://localhost:5001/DeleteAllFiles", 'DELETE')
-        updatePage().then();
+        updatePage();
     }
 }

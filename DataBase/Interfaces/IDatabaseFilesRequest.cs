@@ -7,10 +7,12 @@ namespace MyCloud.DataBase.Interfaces
 {
     public interface IDatabaseFilesRequest
     {
-        public DataContext DatabaseContext { init; }
-        public IQueryable<MyFileInfo> FindFiles(string userName);
-        public Task<bool> AddFileAsync(User user, MyFileInfo fileInfo);
-        public Task<bool> DeleteFileAsync(string userName, string fileName);
-        public Task<bool> DeleteAllFilesAsync(string userName);
+        public Group Group { set; }
+        public User User { set; }
+        
+        public IQueryable<MyFileInfo> FindFiles();
+        public Task<bool> AddFileAsync(MyFileInfo fileInfo);
+        public Task<bool> DeleteFileAsync(string fileName);
+        public Task<bool> DeleteAllFilesAsync();
     }
 }

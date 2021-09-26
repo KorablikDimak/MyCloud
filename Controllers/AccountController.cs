@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyCloud.DataBase.Interfaces;
+using MyCloud.DataBase.DataRequestBuilder;
 using MyCloud.Models.Login;
 using MyCloud.Models.User;
 
@@ -15,15 +15,11 @@ namespace MyCloud.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IDatabaseUsersRequest _databaseUsersRequest;
-        private readonly IDatabasePersonalityRequest _databasePersonalityRequest;
-        private readonly IDatabaseGroupsRequest _databaseGroupsRequest;
+        private readonly IDatabaseRequest _databaseRequest;
 
-        public AccountController(IDatabaseUsersRequest databaseUsersRequest, IDatabasePersonalityRequest databasePersonalityRequest, IDatabaseGroupsRequest databaseGroupsRequest)
+        public AccountController(AccountDataRequestBuilder accountDataRequestBuilder)
         {
-            _databaseUsersRequest = databaseUsersRequest;
-            _databasePersonalityRequest = databasePersonalityRequest;
-            _databaseGroupsRequest = databaseGroupsRequest;
+            _databaseRequest = accountDataRequestBuilder.DatabaseRequest;
         }
         
         [HttpGet]
@@ -37,7 +33,7 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
 
-            var user = await _databaseUsersRequest.FindUserAsync(loginModel.UserName, loginModel.Password);
+            var user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(loginModel.UserName, loginModel.Password);
             if (user == null) return new ForbidResult();
             
             await AuthenticateAsync(loginModel.UserName);
@@ -70,13 +66,13 @@ namespace MyCloud.Controllers
             if (!ModelState.IsValid) return new ForbidResult();
             if (registrationModel.Password != registrationModel.ConfirmPassword) return new ConflictResult();
             
-            bool isAdded = await _databaseUsersRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
+            bool isAdded = await _databaseRequest.DatabaseUsersRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
             if (!isAdded) return new ConflictResult();
             
             bool isCreated = CreateUserDirectory(registrationModel.UserName);
             if (isCreated) return Ok();
             
-            await _databaseUsersRequest.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
+            await _databaseRequest.DatabaseUsersRequest.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
             return new ConflictResult();
         }
         
@@ -98,20 +94,17 @@ namespace MyCloud.Controllers
         [HttpGet("GetPersonality")]
         public async Task<Personality> GetPersonality()
         {
-            if (User.Identity == null) return new Personality();
-            return await _databasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
+            return await _databaseRequest.DatabasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
         }
 
         [Authorize]
         [HttpPatch("ChangeUserName")]
         public async Task<IActionResult> ChangeUserName([FromBody] string newUserName)
         {
-            if (User.Identity == null) return new ConflictResult();
-
-            Personality personality = await _databasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
+            Personality personality = await _databaseRequest.DatabasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
             if (personality == null) return new ConflictResult();
             
-            bool isUserNameChanged = await _databaseUsersRequest.ChangeUserNameAsync(personality, newUserName);
+            bool isUserNameChanged = await _databaseRequest.DatabaseUsersRequest.ChangeUserNameAsync(personality, newUserName);
             if (!isUserNameChanged) return new ConflictResult();
             
             bool isDirectoryChanged = ChangeDirectoryName(User.Identity.Name, newUserName);
@@ -141,8 +134,7 @@ namespace MyCloud.Controllers
         [HttpPatch("ChangePersonality")]
         public async Task<IActionResult> ChangePersonality([FromBody] Personality newPersonality)
         {
-            if (User.Identity == null) return new ConflictResult();
-            bool isChanged = await _databasePersonalityRequest.ChangePersonalityAsync(User.Identity.Name, newPersonality);
+            bool isChanged = await _databaseRequest.DatabasePersonalityRequest.ChangePersonalityAsync(User.Identity.Name, newPersonality);
             if (isChanged) return Ok();
             return new ConflictResult();
         }
@@ -151,8 +143,7 @@ namespace MyCloud.Controllers
         [HttpPatch("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel passwordModel)
         {
-            if (User.Identity == null) return new ConflictResult();
-            bool isChanged = await _databaseUsersRequest.ChangePasswordAsync(
+            bool isChanged = await _databaseRequest.DatabaseUsersRequest.ChangePasswordAsync(
                 User.Identity.Name, 
                 passwordModel.OldPassword, 
                 passwordModel.NewPassword);
@@ -164,8 +155,7 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteAccount")]
         public async Task<IActionResult> DeleteAccount([FromBody] string password)
         {
-            if (User.Identity == null) return new ConflictResult();
-            bool isUserDeleted = await _databaseUsersRequest.DeleteUserAsync(User.Identity.Name, password);
+            bool isUserDeleted = await _databaseRequest.DatabaseUsersRequest.DeleteUserAsync(User.Identity.Name, password);
             if (!isUserDeleted) return new ConflictResult();
             bool isDirectoryDeleted = DeleteUserDirectory(User.Identity.Name);
             if (!isDirectoryDeleted) return new ConflictResult();
@@ -200,8 +190,7 @@ namespace MyCloud.Controllers
         [HttpGet("FindMyGroups")]
         public async Task<List<GroupLogin>> FindMyGroups()
         {
-            if (User.Identity == null) return new List<GroupLogin>();
-            return new List<GroupLogin>(await _databaseGroupsRequest.FindGroupsInUser(User.Identity.Name));
+            return new List<GroupLogin>(await _databaseRequest.DatabaseGroupsRequest.FindGroupsInUser(User.Identity.Name));
         }
 
         [Authorize]
@@ -209,10 +198,10 @@ namespace MyCloud.Controllers
         public async Task<List<Personality>> FindUsersInGroup([FromBody] GroupLogin groupLogin)
         {
             List<Personality> personalities = new List<Personality>();
-            List<User> users = await _databaseUsersRequest.FindUsersInGroup(groupLogin);
+            List<User> users = await _databaseRequest.DatabaseUsersRequest.FindUsersInGroup(groupLogin);
             foreach (var user in users)
             {
-                Personality personality = await _databasePersonalityRequest.FindPersonalityAsync(user.UserName);
+                Personality personality = await _databaseRequest.DatabasePersonalityRequest.FindPersonalityAsync(user.UserName);
                 personalities.Add(personality);
             }
 
@@ -223,10 +212,9 @@ namespace MyCloud.Controllers
         [HttpPost("EnterInGroup")]
         public async Task<IActionResult> EnterInGroup([FromBody] GroupLogin groupLogin)
         {
-            if (User.Identity == null) return new ConflictResult();
-            User user = await _databaseUsersRequest.FindUserAsync(User.Identity.Name);
+            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
-            bool isEntered = await _databaseGroupsRequest.AddUserInGroupAsync(groupLogin, user);
+            bool isEntered = await _databaseRequest.DatabaseGroupsRequest.AddUserInGroupAsync(groupLogin, user);
             if (isEntered) return Ok();
             return new ConflictResult();
         }
@@ -235,10 +223,9 @@ namespace MyCloud.Controllers
         [HttpDelete("LeaveFromGroup")]
         public async Task<IActionResult> LeaveFromGroup([FromBody] GroupLogin groupLogin)
         {
-            if (User.Identity == null) return new ConflictResult();
-            User user = await _databaseUsersRequest.FindUserAsync(User.Identity.Name);
+            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
-            bool isLeave = await _databaseGroupsRequest.RemoveUserFromGroupAsync(groupLogin, user);
+            bool isLeave = await _databaseRequest.DatabaseGroupsRequest.RemoveUserFromGroupAsync(groupLogin, user);
             if (isLeave) return Ok();
             return new ConflictResult();
         }
@@ -247,10 +234,9 @@ namespace MyCloud.Controllers
         [HttpPost("CreateGroup")]
         public async Task<IActionResult> CreateGroup([FromBody] GroupLogin groupLogin)
         {
-            if (User.Identity == null) return new ConflictResult();
-            User user = await _databaseUsersRequest.FindUserAsync(User.Identity.Name);
+            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
-            bool isCreated = await _databaseGroupsRequest.CreateGroupAsync(groupLogin, user);
+            bool isCreated = await _databaseRequest.DatabaseGroupsRequest.CreateGroupAsync(groupLogin, user);
             if (isCreated) return Ok();
             return new ConflictResult();
         }
@@ -259,7 +245,7 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteGroup")]
         public async Task<IActionResult> DeleteGroup([FromBody] GroupLogin groupLogin)
         {
-            bool isDeleted = await _databaseGroupsRequest.DeleteGroupAsync(groupLogin);
+            bool isDeleted = await _databaseRequest.DatabaseGroupsRequest.DeleteGroupAsync(groupLogin);
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
@@ -268,7 +254,7 @@ namespace MyCloud.Controllers
         [HttpPatch("ChangeGroupName")]
         public async Task<IActionResult> ChangeGroupLogin([FromBody] GroupLogin[] groupLogin)
         {
-            bool isChanged = await _databaseGroupsRequest.ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
+            bool isChanged = await _databaseRequest.DatabaseGroupsRequest.ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
             if (isChanged) return Ok();
             return new ConflictResult();
         }

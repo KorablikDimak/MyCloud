@@ -8,11 +8,16 @@ namespace MyCloud.DataBase
 {
     public class DatabasePersonalityRequest : IDatabasePersonalityRequest
     {
-        public DataContext DatabaseContext { private get; init; }
+        private readonly DataContext _databaseContext;
+
+        public DatabasePersonalityRequest(DataContext context)
+        {
+            _databaseContext = context;
+        }
 
         public async Task<Personality> FindPersonalityAsync(string userName)
         {
-            Personality personality = await DatabaseContext.Personality.FirstOrDefaultAsync(personalityData => 
+            Personality personality = await _databaseContext.Personality.FirstOrDefaultAsync(personalityData => 
                 personalityData.User.UserName == userName);
             return personality;
         }
@@ -25,7 +30,7 @@ namespace MyCloud.DataBase
                 if (personality == null) return false;
                 personality.Name = newPersonality.Name;
                 personality.Surname = newPersonality.Surname;
-                await DatabaseContext.SaveChangesAsync();
+                await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {

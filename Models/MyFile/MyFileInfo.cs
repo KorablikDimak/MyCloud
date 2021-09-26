@@ -1,4 +1,5 @@
 using System;
+using MyCloud.Models.User;
 
 namespace MyCloud.Models.MyFile
 {
@@ -10,5 +11,6 @@ namespace MyCloud.Models.MyFile
         public DateTime DateTime { get; set; }
         public long Size { get; set; }
         public User.User User { get; set; }
+        public Group Group { get; set; }
     }
 }

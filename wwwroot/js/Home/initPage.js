@@ -9,7 +9,7 @@ function initPage() {
     initShowTypeButtons();
     initSearching();
     initLogOutButton()
-    updatePage().then();
+    updatePage();
 }
 
 function initRedirectToProfileButton() {
@@ -55,14 +55,14 @@ function initShowTypeButtons() {
         tableButton.style.backgroundColor = "#e7e7e7";
         listButton.style.backgroundColor = "rgba(56,56,56,0)";
         showType = showFileTable;
-        updatePage().then();
+        updatePage();
     });
     
     listButton.addEventListener("click", evt => {
         listButton.style.backgroundColor = "#e7e7e7";
         tableButton.style.backgroundColor = "rgba(56,56,56,0)";
         showType = showFileList;
-        updatePage().then();
+        updatePage();
     });
 }
 
@@ -115,13 +115,13 @@ function initSortOptions() {
     ASC.addEventListener("click", ev => {
         fileInfoBody.typeOfSort = "ASC";
         arrow.src = "https://localhost:5001/images/free-icon-down-arrow-134210.png";
-        updatePage().then();
+        updatePage();
     });
 
     DESC.addEventListener("click", ev => {
         fileInfoBody.typeOfSort = "DESC";
         arrow.src = "https://localhost:5001/images/free-icon-up-arrow-134211.png";
-        updatePage().then();
+        updatePage();
     });
 
     sortBy.forEach(addClickEvent);
@@ -130,7 +130,7 @@ function initSortOptions() {
         sortBy.addEventListener("click", ev => {
             fileInfoBody.orderBy = sortBy.id;
             currentSortType.innerText = sortBy.innerText;
-            updatePage().then();
+            updatePage();
         });
     }
 }

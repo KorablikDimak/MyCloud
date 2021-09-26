@@ -12,6 +12,11 @@ let confirmButtons = [confirmChangeButton, confirmCreateButton, confirmDeleteBut
 initPage().then();
 
 async function initPage() {    
+    let exitButton = document.querySelector(".exit-button");
+    exitButton.addEventListener("click", () => {
+        window.location = "https://localhost:5001/Account/Profile";
+    });
+    
     groupWindow.addEventListener("click", ev => {
         const target = ev.target;
         if (target === groupWindow) {
@@ -55,38 +60,38 @@ async function initPage() {
         console.log(message);
         sendJsonMessage("https://localhost:5001/ChangeGroupName", 'Patch', message).then(response => {
             if (response.status === 200) {
-                updateGroupData(newName, newPassword);
                 updatePage().then();
             }
         });
+        updateGroupData(newName, newPassword);
     });
     
     confirmCreateButton.addEventListener("click", () => {
         createGroup().then(response => {
             if (response.status === 200) {
-                resetHighlight();
                 updatePage().then();
             }
         });
+        resetHighlight();
     });
     
     confirmDeleteButton.addEventListener("click", () => {
         deleteGroup().then(response => {
             if (response.status === 200) {
-                resetGroupData();
-                resetHighlight();
                 updatePage().then();
             }
         });
+        resetGroupData();
+        resetHighlight();
     });
     
     confirmEnterButton.addEventListener("click", () => {
         enterTheGroup().then(response => {
             if (response.status === 200) {
-                resetHighlight();
                 updatePage().then();
             }
         });
+        resetHighlight();
     });
 
     let confirmLeaveButton = document.getElementById("leave-group");
@@ -94,10 +99,10 @@ async function initPage() {
         if (confirm("Вы уверены, что хотите покинуть группу?")) {
             sendMessage("https://localhost:5001/LeaveFromGroup", 'DELETE').then(response => {
                 if (response.status === 200) {
-                    resetGroupData();
                     updatePage().then();
                 }
             });
+            resetGroupData();
         }
     });
 
@@ -186,9 +191,6 @@ function addGroup(group) {
         updateUsers().then();
     });
     groups.append(groupElement);
-
-    let line = document.createElement("hr");
-    line.className = "horizontal-line";
 }
 
 function clearUsers() {
@@ -211,7 +213,4 @@ function addUser(user) {
         userElement.innerText = `${user.surname} ${user.name} (${user.userName})`;
     }
     users.append(userElement);
-    
-    let line = document.createElement("hr");
-    line.className = "horizontal-line";
 }

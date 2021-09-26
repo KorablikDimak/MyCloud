@@ -19,7 +19,7 @@ namespace MyCloud.DataBase.DataRequestBuilder
 
         protected override void BuildPersonalityRequest()
         {
-            DatabaseRequest.DatabaseUsersRequest = new DatabaseUsersRequest(Context);
+            DatabaseRequest.DatabasePersonalityRequest = new DatabasePersonalityRequest(Context);
         }
 
         protected override void BuildUsersRequest()

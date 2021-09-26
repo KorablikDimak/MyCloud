@@ -36,44 +36,45 @@ namespace MyCloud.Controllers
         [HttpPost("LoadFiles")]
         public async Task<IActionResult> LoadFiles(ICollection<IFormFile> files)
         {
-            foreach (var file in files) 
-            {
-                string untrustedFileName = Path.GetFileName(file.FileName);
-                string filePath = $"UserFiles\\{User.Identity.Name}\\{untrustedFileName}";
-                if (!IsMemoryFree($"UserFiles\\{User.Identity.Name}", file.Length)) return new ConflictResult();
-                if (await SaveFile(_databaseRequest.DatabaseFilesRequest, file, filePath)) continue;
-                return new ConflictResult();
-            }
-
-            return Ok();
+            if (!await SetUser(_databaseRequest.DatabaseFilesRequest)) return new ConflictResult();
+            bool isSaved =
+                await SaveFiles(_databaseRequest.DatabaseFilesRequest, files, $"UserFiles\\{User.Identity.Name}");
+            if (isSaved) return Ok();
+            return new ConflictResult();
         }
 
-        private async Task<bool> SaveFile(
-            IDatabaseFilesRequest databaseFilesRequest, IFormFile file, string filePath)
+        private async Task<bool> SaveFiles(
+            IDatabaseFilesRequest databaseFilesRequest, ICollection<IFormFile> files, string path)
         {
-            if (System.IO.File.Exists(filePath)) return false;
+            foreach (var file in files)
+            {
+                string untrustedFileName = Path.GetFileName(file.FileName);
+                string filePath = path + $"\\{untrustedFileName}";
+            
+                if (!IsMemoryFree(path, file.Length)) return false;
+                if (System.IO.File.Exists(filePath)) return false;
                 
-            await using var stream = System.IO.File.Create(filePath);
-            var fileInfo = new FileInfo(stream.Name);
-            var myFileInfo = new MyFileInfo 
-            {
-                Name = fileInfo.Name, 
-                TypeOfFile = fileInfo.Extension, 
-                DateTime = fileInfo.CreationTime,
-                Size = file.Length
-            };
-
-            if (!await SetUser(databaseFilesRequest)) return false;
-            bool isAdded = await databaseFilesRequest.AddFileAsync(myFileInfo);
-            if (isAdded)
-            {
-                await file.CopyToAsync(stream);
-            }
-            else
-            {
-                stream.Close();
-                System.IO.File.Delete(filePath);
-                return false;
+                await using var stream = System.IO.File.Create(filePath);
+                var fileInfo = new FileInfo(stream.Name);
+                var myFileInfo = new MyFileInfo 
+                {
+                    Name = fileInfo.Name, 
+                    TypeOfFile = fileInfo.Extension, 
+                    DateTime = fileInfo.CreationTime,
+                    Size = file.Length
+                };
+            
+                bool isAdded = await databaseFilesRequest.AddFileAsync(myFileInfo);
+                if (isAdded)
+                {
+                    await file.CopyToAsync(stream);
+                }
+                else
+                {
+                    stream.Close();
+                    System.IO.File.Delete(filePath);
+                    return false;
+                }
             }
 
             return true;
@@ -97,12 +98,12 @@ namespace MyCloud.Controllers
         [HttpPost("GetFileInfo")]
         public async Task<List<MyFileInfo>> GetFileInfo([FromBody] SortType sortType)
         {
-            return await GetFileInfos(_databaseRequest.DatabaseFilesRequest, sortType);
+            if (!await SetUser(_databaseRequest.DatabaseFilesRequest)) return new List<MyFileInfo>();
+            return GetFileInfos(_databaseRequest.DatabaseFilesRequest, sortType);
         }
 
-        private async Task<List<MyFileInfo>> GetFileInfos(IDatabaseFilesRequest databaseFilesRequest, SortType sortType)
+        private List<MyFileInfo> GetFileInfos(IDatabaseFilesRequest databaseFilesRequest, SortType sortType)
         {
-            if (!await SetUser(databaseFilesRequest)) return new List<MyFileInfo>();
             IQueryable<MyFileInfo> files = databaseFilesRequest.FindFiles();
 
             files = sortType.OrderBy switch
@@ -142,6 +143,7 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteOneFile")]
         public async Task<IActionResult> DeleteOneFile([FromBody] string fileName)
         {
+            if (!await SetUser(_databaseRequest.DatabaseFilesRequest)) return new ConflictResult();
             string filepath = Path.Combine($"UserFiles\\{User.Identity.Name}", fileName);
             bool isDeleted = await DeleteFile(_databaseRequest.DatabaseFilesRequest, fileName, filepath);
             if (isDeleted) return Ok();
@@ -151,7 +153,6 @@ namespace MyCloud.Controllers
         private async Task<bool> DeleteFile(
             IDatabaseFilesRequest databaseFilesRequest, string fileName, string filepath)
         {
-            if (!await SetUser(databaseFilesRequest)) return false;
             bool isDeleted = await databaseFilesRequest.DeleteFileAsync(fileName);
             if (!isDeleted) return false;
             System.IO.File.Delete(filepath);
@@ -162,14 +163,15 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteAllFiles")]
         public async Task<IActionResult> DeleteAllFiles()
         {
-            bool isDeleted = await DeleteAll(_databaseRequest.DatabaseFilesRequest, $"UserFiles\\{User.Identity.Name}");
+            if (!await SetUser(_databaseRequest.DatabaseFilesRequest)) return new ConflictResult();
+            bool isDeleted = await DeleteAll(_databaseRequest.DatabaseFilesRequest, 
+                $"UserFiles\\{User.Identity.Name}");
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
 
         private async Task<bool> DeleteAll(IDatabaseFilesRequest databaseFilesRequest, string filePath)
         {
-            if (!await SetUser(databaseFilesRequest)) return false;
             bool isDeleted = await databaseFilesRequest.DeleteAllFilesAsync();
             if (!isDeleted) return false;
             
@@ -201,6 +203,69 @@ namespace MyCloud.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("GetCommonFiles")]
+        public async Task<List<MyFileInfo>> GetCommonFiles([FromBody] GroupLogin groupLogin, SortType sortType)
+        {
+            if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new List<MyFileInfo>();
+            return GetFileInfos(_databaseRequest.DatabaseCommonFilesRequest, sortType);
+        }
+
+        private async Task<bool> SetGroup(IDatabaseFilesRequest databaseFilesRequest, GroupLogin groupLogin)
+        {
+            Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            if (group == null) return false;
+            databaseFilesRequest.Group = group;
+            return true;
+        }
+
+        [Authorize]
+        [HttpPost("LoadCommonFiles")]
+        public async Task<IActionResult> LoadCommonFiles([FromBody] ICollection<IFormFile> files, GroupLogin groupLogin)
+        {
+            if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
+            bool isSaved = await SaveFiles(_databaseRequest.DatabaseCommonFilesRequest, files,
+                $"CommonFiles\\{groupLogin.GroupName}");
+            if (isSaved) return Ok();
+            return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteOneCommonFile")]
+        public async Task<IActionResult> DeleteOneCommonFile([FromBody] GroupLogin groupLogin, string fileName)
+        {
+            if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
+            string filePath = $"CommonFiles\\{groupLogin.GroupName}";
+            bool isDeleted = await DeleteFile(_databaseRequest.DatabaseCommonFilesRequest, fileName, filePath);
+            if (isDeleted) return Ok();
+            return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteAllCommonFiles")]
+        public async Task<IActionResult> DeleteAllCommonFiles([FromBody] GroupLogin groupLogin)
+        {
+            if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
+            string filePath = $"CommonFiles\\{groupLogin.GroupName}";
+            bool isDeleted = await DeleteAll(_databaseRequest.DatabaseCommonFilesRequest, filePath);
+            if (isDeleted) return Ok();
+            return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpGet("GetCommonMemorySize")]
+        public async Task<long> GetCommonMemorySize()
+        {
+            List<Group> groups = await _databaseRequest.DatabaseGroupsRequest.FindGroupsInUser(User.Identity.Name);
+            long commonMemorySize = 0;
+            foreach (var group in groups)
+            {
+                commonMemorySize += GetDirectorySize($"CommonFiles\\{group.GroupName}");
+            }
+
+            return commonMemorySize;
         }
     }
 }

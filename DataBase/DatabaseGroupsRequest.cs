@@ -17,7 +17,7 @@ namespace MyCloud.DataBase
             _databaseContext = context;
         }
 
-        private async Task<Group> FindGroupAsync(GroupLogin groupLogin)
+        public async Task<Group> FindGroupAsync(GroupLogin groupLogin)
         {
             return await _databaseContext.Groups.FirstOrDefaultAsync(group => 
                 group.GroupName == groupLogin.GroupName &&

@@ -128,7 +128,7 @@ namespace MyCloud.Controllers
 
         [Authorize]
         [RequestSizeLimit(1073741824)]
-        [HttpPost("GetFile")]
+        [HttpPost("GetVirtualFile")]
         public VirtualFileResult GetVirtualFile([FromBody] string fileName)
         {
             return GetFile(fileName, $"~/UserFiles/{User.Identity.Name}");
@@ -208,8 +208,14 @@ namespace MyCloud.Controllers
 
         [Authorize]
         [HttpPost("GetCommonFileInfo")]
-        public async Task<List<MyFileInfo>> GetCommonFileInfo([FromBody] GroupLogin groupLogin, SortType sortType)
+        public async Task<List<MyFileInfo>> GetCommonFileInfo([FromBody] SortType sortType,
+            [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
         {
+            GroupLogin groupLogin = new GroupLogin
+            {
+                Name = groupName,
+                GroupPassword = groupPassword
+            };
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new List<MyFileInfo>();
             return GetFileInfos(_databaseRequest.DatabaseCommonFilesRequest, sortType);
         }
@@ -221,11 +227,33 @@ namespace MyCloud.Controllers
             databaseFilesRequest.Group = group;
             return true;
         }
+        
+        [Authorize]
+        [RequestSizeLimit(1073741824)]
+        [HttpPost("GetCommonVirtualFile")]
+        public async Task<VirtualFileResult> GetCommonVirtualFile([FromBody] string fileName, 
+            [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
+        {
+            GroupLogin groupLogin = new GroupLogin
+            {
+                Name = groupName,
+                GroupPassword = groupPassword
+            };
+            Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            if (group == null) return null;
+            return GetFile(fileName, $"~/CommonFiles/{group.Name}");
+        }
 
         [Authorize]
         [HttpPost("LoadCommonFiles")]
-        public async Task<IActionResult> LoadCommonFiles([FromBody] ICollection<IFormFile> files, GroupLogin groupLogin)
+        public async Task<IActionResult> LoadCommonFiles(ICollection<IFormFile> files, 
+            [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
         {
+            GroupLogin groupLogin = new GroupLogin
+            {
+                Name = groupName,
+                GroupPassword = groupPassword
+            };
             long size = 0;
             foreach (var file in files)
             {
@@ -242,8 +270,14 @@ namespace MyCloud.Controllers
 
         [Authorize]
         [HttpDelete("DeleteOneCommonFile")]
-        public async Task<IActionResult> DeleteOneCommonFile([FromBody] GroupLogin groupLogin, string fileName)
+        public async Task<IActionResult> DeleteOneCommonFile([FromBody] string fileName,
+            [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
         {
+            GroupLogin groupLogin = new GroupLogin
+            {
+                Name = groupName,
+                GroupPassword = groupPassword
+            };
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
             string filePath = $"CommonFiles\\{groupLogin.Name}";
             bool isDeleted = await DeleteFile(_databaseRequest.DatabaseCommonFilesRequest, fileName, filePath);
@@ -253,8 +287,14 @@ namespace MyCloud.Controllers
 
         [Authorize]
         [HttpDelete("DeleteAllCommonFiles")]
-        public async Task<IActionResult> DeleteAllCommonFiles([FromBody] GroupLogin groupLogin)
+        public async Task<IActionResult> DeleteAllCommonFiles(
+            [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
         {
+            GroupLogin groupLogin = new GroupLogin
+            {
+                Name = groupName,
+                GroupPassword = groupPassword
+            };
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
             string filePath = $"CommonFiles\\{groupLogin.Name}";
             bool isDeleted = await DeleteAll(_databaseRequest.DatabaseCommonFilesRequest, filePath);

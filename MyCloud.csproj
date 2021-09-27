@@ -19,8 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CommonFiles\Dimas" />
-      <Folder Include="UserFiles\Dima" />
+      <Folder Include="CommonFiles" />
+      <Folder Include="UserFiles" />
     </ItemGroup>
 
     <ItemGroup>

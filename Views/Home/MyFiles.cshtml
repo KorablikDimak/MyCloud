@@ -35,7 +35,7 @@
                     Загрузить файл
                 </label>
                 <input type="file" id="load-file" name="files" class="load-file-input" multiple/>
-                <div class="my-files">
+                <div class="my-files" id="my-files">
                     <img alt="" src="~/images/free-icon-folder-149334.png" class="img-in-slider"/>
                     <div class="empty"></div>
                     <a class="left-slider-font">Мои файлы</a>
@@ -62,7 +62,7 @@
             <div class="center">
                 <div class="file-header">
                     <div class="file-header-container">
-                        <h1 class="file-header-bold">Мои файлы</h1>
+                        <h1 class="file-header-bold" id="file-header">Мои файлы</h1>
                     </div>
                     <div class="empty"></div>
                     <div class="sort-type" id="sort-type-button">
@@ -119,11 +119,14 @@
             </div>
         </div>
     </div>
-    <script src="~/js/Home/updatePage.js"></script>
-    <script src="~/js/Home/dragAndDrop.js"></script>
-    <script src="~/js/Home/gradientFunction.js"></script>
-    <script src="~/js/Home/loadFiles.js"></script>
     <script src="~/js/sendMessage.js"></script>
+    <script src="~/js/Home/dragAndDrop.js"></script>
+    <script src="~/js/Home/FileLoader.js"></script>
+    <script src="~/js/Home/gradientFunction.js"></script>
+    <script src="~/js/Home/MemoryCounter.js"></script>
+    <script src="~/js/Home/GroupLoader.js"></script>
+    <script src="~/js/Home/Container.js"></script>
+    <script src="~/js/Home/PageUpdater.js"></script>
     <script src="~/js/Home/initPage.js"></script>
 </body>
 </html>

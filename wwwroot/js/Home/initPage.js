@@ -1,138 +1,117 @@
-initPage();
+let pageUpdater = new PageUpdater();
+pageUpdater.updatePage().then();
+pageUpdater.addSearch();
 
-function initPage() {
-    initRedirectToProfileButton();
-    initLoader();
-    initDeleter();
-    initDragDrop();
-    initSortOptions();
-    initShowTypeButtons();
-    initSearching();
-    initLogOutButton()
+function updatePage() {
+    pageUpdater.updatePage().then();
+}
+
+let header = document.getElementById("file-header");
+
+let commonButton = document.getElementById("common-files");
+commonButton.addEventListener("click", () => {
+    pageUpdater.typeOfPage = "groups";
+    header.innerText = "Мои группы";
     updatePage();
-}
+});
 
-function initRedirectToProfileButton() {
-    let profileButton = document.getElementById("profile");
-    profileButton.addEventListener("click", () => {
-        window.location = "Https://localhost:5001/Account/Profile"
-    });
-}
+let myFilesButton = document.getElementById("my-files");
+myFilesButton.addEventListener("click", () => {
+    pageUpdater.typeOfPage = "myFiles";
+    header.innerText = "Мои файлы";
+    updatePage();
+});
 
-function initLogOutButton() {
-    let logOutButton = document.getElementById("logOut-button");
-    logOutButton.addEventListener("click", () => {
-        logout().then();
-    });
-}
+let profileButton = document.getElementById("profile");
+profileButton.addEventListener("click", () => {
+    window.location = "Https://localhost:5001/Account/Profile"
+});
 
-function initSearching() {
-    let searchInput = document.getElementById("search-input");
-    
-    searchInput.addEventListener("input", () => {
-        search(searchInput.value.toLowerCase()).then();
-    });
-}
+let logOutButton = document.getElementById("logOut-button");
+logOutButton.addEventListener("click", () => {
+    logout().then();
+});
 
-async function search(textToFind) {
-    let filesInfo = await loadFileInfo();
-    let json = [];
-    filesInfo.forEach(function (fileInfo) {
-        if (fileInfo.name.toLowerCase().indexOf(textToFind) !== -1) {
-            json.push(fileInfo);
-        }
-    });
-    clearFileContainer();
-    pullFileContainer(json);
-}
+let loadInput = document.getElementById("load-file");
+loadInput.addEventListener("change", () => pageUpdater.loadFiles(loadInput));
 
-function initShowTypeButtons() {
-    let tableButton = document.querySelector(".icon-table-container");
+let deleter = document.getElementById("delete-all-files")
+deleter.addEventListener("click", () => pageUpdater.deleteAll());
+
+let tableButton = document.querySelector(".icon-table-container");
+tableButton.style.backgroundColor = "#e7e7e7";
+tableButton.addEventListener("click", () => {
     tableButton.style.backgroundColor = "#e7e7e7";
-    let listButton = document.querySelector(".icon-list-container");
-    
-    tableButton.addEventListener("click", () => {
-        tableButton.style.backgroundColor = "#e7e7e7";
-        listButton.style.backgroundColor = "rgba(56,56,56,0)";
-        showType = showFileTable;
-        updatePage();
-    });
-    
-    listButton.addEventListener("click", () => {
-        listButton.style.backgroundColor = "#e7e7e7";
-        tableButton.style.backgroundColor = "rgba(56,56,56,0)";
-        showType = showFileList;
-        updatePage();
-    });
+    listButton.style.backgroundColor = "rgba(56,56,56,0)";
+    pageUpdater.showType = "table";
+    updatePage();
+});
+
+let listButton = document.querySelector(".icon-list-container");
+listButton.addEventListener("click", () => {
+    listButton.style.backgroundColor = "#e7e7e7";
+    tableButton.style.backgroundColor = "rgba(56,56,56,0)";
+    pageUpdater.showType = "list";
+    updatePage();
+});
+
+let container = document.getElementById("container");
+;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    container.addEventListener(eventName, preventDefaults, false);
+});
+;['dragenter', 'dragover'].forEach(eventName => {
+    container.addEventListener(eventName, () => highlight(container), false);
+});
+;['dragleave', 'drop'].forEach(eventName => {
+    container.addEventListener(eventName, () => unhighlight(container), false);
+});
+container.addEventListener('drop', handleDrop, false);
+
+let sortType = {
+    OrderBy: "name",
+    TypeOfSort: "ASC"
 }
 
-function initLoader() {
-    let loadInput = document.getElementById("load-file");
-    loadInput.addEventListener("change", () => loadInputChanged(loadInput));
-}
+let sortBy = [document.getElementById("name"),
+    document.getElementById("typeoffile"),
+    document.getElementById("datetime"),
+    document.getElementById("size")];
 
-function initDeleter() {
-    let deleter = document.getElementById("delete-all-files")
-    deleter.addEventListener("click", () => deleteAllFiles());
-}
+document.getElementById("chosen-name").style.backgroundColor = "#404040";
+document.getElementById("chosen-ASC").style.backgroundColor = "#404040";
 
-function initDragDrop() {
-    let container = document.getElementById("container");
+let sortOption = document.querySelectorAll(".dropdown-line");
+sortOption.forEach(sortOptionClicked);
 
-    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        container.addEventListener(eventName, preventDefaults, false);
-    });
+let ASC = document.getElementById("ASC");
+let DESC = document.getElementById("DESC");
 
-    ;['dragenter', 'dragover'].forEach(eventName => {
-        container.addEventListener(eventName, () => highlight(container), false);
-    });
+let currentSortType = document.getElementById("current-sort-type");
+let arrow = document.getElementById("arrow");
 
-    ;['dragleave', 'drop'].forEach(eventName => {
-        container.addEventListener(eventName, () => unhighlight(container), false);
-    });
+ASC.addEventListener("click", () => {
+    sortType.TypeOfSort = "ASC"
+    pageUpdater.changeSortType(sortType);
+    arrow.src = "https://localhost:5001/images/free-icon-down-arrow-134210.png";
+    updatePage();
+});
 
-    container.addEventListener('drop', handleDrop, false);
-}
+DESC.addEventListener("click", () => {
+    sortType.TypeOfSort = "DESC";
+    pageUpdater.changeSortType(sortType);
+    arrow.src = "https://localhost:5001/images/free-icon-up-arrow-134211.png";
+    updatePage();
+});
 
-function initSortOptions() {
-    let sortBy = [document.getElementById("name"),
-        document.getElementById("typeoffile"),
-        document.getElementById("datetime"),
-        document.getElementById("size")];
+sortBy.forEach(addClickEvent);
 
-    document.getElementById("chosen-name").style.backgroundColor = "#404040";
-    document.getElementById("chosen-ASC").style.backgroundColor = "#404040";
-
-    let sortOption = document.querySelectorAll(".dropdown-line");
-    sortOption.forEach(sortOptionClicked);
-
-    let ASC = document.getElementById("ASC");
-    let DESC = document.getElementById("DESC");
-
-    let currentSortType = document.getElementById("current-sort-type");
-    let arrow = document.getElementById("arrow");
-
-    ASC.addEventListener("click", () => {
-        fileInfoBody.typeOfSort = "ASC";
-        arrow.src = "https://localhost:5001/images/free-icon-down-arrow-134210.png";
+function addClickEvent(sortBy) {
+    sortBy.addEventListener("click", () => {
+        sortType.OrderBy = sortBy.id;
+        pageUpdater.changeSortType(sortType);
+        currentSortType.innerText = sortBy.innerText;
         updatePage();
     });
-
-    DESC.addEventListener("click", () => {
-        fileInfoBody.typeOfSort = "DESC";
-        arrow.src = "https://localhost:5001/images/free-icon-up-arrow-134211.png";
-        updatePage();
-    });
-
-    sortBy.forEach(addClickEvent);
-
-    function addClickEvent(sortBy) {
-        sortBy.addEventListener("click", () => {
-            fileInfoBody.orderBy = sortBy.id;
-            currentSortType.innerText = sortBy.innerText;
-            updatePage();
-        });
-    }
 }
 
 function sortOptionClicked(dropDownLine) {

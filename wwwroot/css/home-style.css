@@ -393,7 +393,7 @@ body {
 
 .file {
     transition: background-color 0.18s ease-in-out;
-    margin: 10px 5px;
+    margin: 10px 0 10px 15px;
     padding: 10px 5px 20px 5px;
     width: 80px;
     height: 110px;

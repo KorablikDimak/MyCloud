@@ -1,6 +1,6 @@
-async function sendJsonMessage (uri, method, message = null) {
+async function sendJsonMessage (uri, method, message = "") {
     let init;
-    if (message == null) {
+    if (message === "") {
         init = {
             method: method
         }
@@ -14,7 +14,19 @@ async function sendJsonMessage (uri, method, message = null) {
             body: JSON.stringify(message)
         }
     }
-    
+    return await fetch(uri, init);
+}
+
+async function sendCommonJsonMessage(uri, method, message) {
+    let init = {
+        method: method,
+        headers: {
+            'GroupName': FileLoader.groupLogin.Name,
+            'GroupPassword': FileLoader.groupLogin.GroupPassword,
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(message)
+    }
     return await fetch(uri, init);
 }
 

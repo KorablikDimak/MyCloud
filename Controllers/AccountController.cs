@@ -234,7 +234,7 @@ namespace MyCloud.Controllers
         [HttpPost("CreateGroup")]
         public async Task<IActionResult> CreateGroup([FromBody] GroupLogin groupLogin)
         {
-            bool isCreated = CreateDirectory($"CommonFiles\\{groupLogin.GroupName}");
+            bool isCreated = CreateDirectory($"CommonFiles\\{groupLogin.Name}");
             if (!isCreated) return new ConflictResult();
             User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
@@ -247,7 +247,7 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteGroup")]
         public async Task<IActionResult> DeleteGroup([FromBody] GroupLogin groupLogin)
         {
-            bool isDeleted = DeleteDirectory($"CommonFiles\\{groupLogin.GroupName}");
+            bool isDeleted = DeleteDirectory($"CommonFiles\\{groupLogin.Name}");
             if (!isDeleted) return new ConflictResult();
             isDeleted = await _databaseRequest.DatabaseGroupsRequest.DeleteGroupAsync(groupLogin);
             if (isDeleted) return Ok();
@@ -259,8 +259,8 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> ChangeGroupLogin([FromBody] GroupLogin[] groupLogin)
         {
             bool isChanged = ChangeDirectoryName("CommonFiles", 
-                groupLogin[0].GroupName, 
-                groupLogin[1].GroupName);
+                groupLogin[0].Name, 
+                groupLogin[1].Name);
             if (!isChanged) return new ConflictResult();
             isChanged = await _databaseRequest.DatabaseGroupsRequest.ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
             if (isChanged) return Ok();

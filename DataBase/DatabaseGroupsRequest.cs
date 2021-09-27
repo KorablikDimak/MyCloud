@@ -20,7 +20,7 @@ namespace MyCloud.DataBase
         public async Task<Group> FindGroupAsync(GroupLogin groupLogin)
         {
             return await _databaseContext.Groups.FirstOrDefaultAsync(group => 
-                group.GroupName == groupLogin.GroupName &&
+                group.Name == groupLogin.Name &&
                 group.GroupPassword == groupLogin.GroupPassword);
         }
 
@@ -38,7 +38,7 @@ namespace MyCloud.DataBase
             {
                 var group = new Group
                 {
-                    GroupName = groupLogin.GroupName,
+                    Name = groupLogin.Name,
                     GroupPassword = groupLogin.GroupPassword
                 };
                 group.Users.Add(user);
@@ -77,11 +77,11 @@ namespace MyCloud.DataBase
             try
             {
                 Group group = await FindGroupAsync(groupLogin);
-                if (group.GroupName != newGroupLogin.GroupName)
+                if (group.Name != newGroupLogin.Name)
                 {
                     if (await FindGroupAsync(groupLogin) != null) return false;
                 }
-                group.GroupName = newGroupLogin.GroupName;
+                group.Name = newGroupLogin.Name;
                 group.GroupPassword = newGroupLogin.GroupPassword;
                 await _databaseContext.SaveChangesAsync();
             }
@@ -119,7 +119,7 @@ namespace MyCloud.DataBase
             {
                 Group currentGroup = await _databaseContext.Groups
                     .Include(group => group.Users)
-                    .FirstAsync(group => group.GroupName == groupLogin.GroupName &&
+                    .FirstAsync(group => group.Name == groupLogin.Name &&
                                          group.GroupPassword == groupLogin.GroupPassword);
                 if (currentGroup.Users.Count == 1)
                 {

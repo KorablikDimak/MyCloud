@@ -21,7 +21,7 @@ namespace MyCloud.DataBase
         {
             Group currentGroup = await _databaseContext.Groups
                 .Include(group => group.Users)
-                .FirstOrDefaultAsync(group => group.GroupName == groupLogin.GroupName && 
+                .FirstOrDefaultAsync(group => group.Name == groupLogin.Name && 
                                               group.GroupPassword == groupLogin.GroupPassword);
             return currentGroup?.Users.ToList();
         }

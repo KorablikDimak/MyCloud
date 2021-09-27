@@ -50,11 +50,11 @@ async function initPage() {
         const newPassword = document.getElementById("group-password").value;
         
         let message = [{
-                GroupName: document.getElementById("groups-name-text").innerText,
+                Name: document.getElementById("groups-name-text").innerText,
                 GroupPassword: document.getElementById("groups-password-text").innerText
             },
             {
-                GroupName: newName,
+                Name: newName,
                 GroupPassword: newPassword
             }];
         console.log(message);
@@ -147,7 +147,7 @@ async function createGroup() {
 
 async function sendMessage(url, method) {
     let message = {
-        GroupName: document.getElementById("group-name").value,
+        Name: document.getElementById("group-name").value,
         GroupPassword: document.getElementById("group-password").value
     };
     return await sendJsonMessage(url, method, message);
@@ -172,21 +172,21 @@ function clearGroups() {
 async function updateGroups() {
     let response = await sendJsonMessage("https://localhost:5001/FindMyGroups", 'GET');
     let json = await response.json();
-    updateGroupData(json[0].groupName, json[0].groupPassword);
+    updateGroupData(json[0].name, json[0].groupPassword);
     json.forEach(addGroup);
 }
 
 function addGroup(group) {
     let groupElement = document.createElement("div");
     groupElement.className = "group";
-    groupElement.innerText = `${group.groupName}`;
+    groupElement.innerText = `${group.name}`;
     groupElement.addEventListener("click", () => {
         let groupElements = document.querySelectorAll(".group");
         groupElements.forEach(function (element) {
             element.classList.remove("highlight");
         });
         groupElement.classList.add("highlight");
-        updateGroupData(group.groupName, group.groupPassword);
+        updateGroupData(group.name, group.groupPassword);
         clearUsers();
         updateUsers().then();
     });

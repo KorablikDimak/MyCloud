@@ -207,8 +207,8 @@ namespace MyCloud.Controllers
         }
 
         [Authorize]
-        [HttpPost("GetCommonFiles")]
-        public async Task<List<MyFileInfo>> GetCommonFiles([FromBody] GroupLogin groupLogin, SortType sortType)
+        [HttpPost("GetCommonFileInfo")]
+        public async Task<List<MyFileInfo>> GetCommonFileInfo([FromBody] GroupLogin groupLogin, SortType sortType)
         {
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new List<MyFileInfo>();
             return GetFileInfos(_databaseRequest.DatabaseCommonFilesRequest, sortType);
@@ -235,7 +235,7 @@ namespace MyCloud.Controllers
             
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
             bool isSaved = await SaveFiles(_databaseRequest.DatabaseCommonFilesRequest, files,
-                $"CommonFiles\\{groupLogin.GroupName}");
+                $"CommonFiles\\{groupLogin.Name}");
             if (isSaved) return Ok();
             return new ConflictResult();
         }
@@ -245,7 +245,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> DeleteOneCommonFile([FromBody] GroupLogin groupLogin, string fileName)
         {
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
-            string filePath = $"CommonFiles\\{groupLogin.GroupName}";
+            string filePath = $"CommonFiles\\{groupLogin.Name}";
             bool isDeleted = await DeleteFile(_databaseRequest.DatabaseCommonFilesRequest, fileName, filePath);
             if (isDeleted) return Ok();
             return new ConflictResult();
@@ -256,7 +256,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> DeleteAllCommonFiles([FromBody] GroupLogin groupLogin)
         {
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
-            string filePath = $"CommonFiles\\{groupLogin.GroupName}";
+            string filePath = $"CommonFiles\\{groupLogin.Name}";
             bool isDeleted = await DeleteAll(_databaseRequest.DatabaseCommonFilesRequest, filePath);
             if (isDeleted) return Ok();
             return new ConflictResult();
@@ -275,7 +275,7 @@ namespace MyCloud.Controllers
             long commonMemorySize = 0;
             foreach (var group in groups)
             {
-                commonMemorySize += GetDirectorySize($"CommonFiles\\{group.GroupName}");
+                commonMemorySize += GetDirectorySize($"CommonFiles\\{group.Name}");
             }
 
             return commonMemorySize;

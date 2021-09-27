@@ -199,7 +199,7 @@ body {
     background-color: #d6d6d6;
 }
 
-.current-files {
+.common-files {
     border-radius: 10px;
     transition: all 0.18s ease-in-out;
     margin-top: 5px;
@@ -210,7 +210,7 @@ body {
     display: flex;
 }
 
-.current-files:hover {
+.common-files:hover {
     background-color: #d6d6d6;
 }
 

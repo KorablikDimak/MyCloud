@@ -1,9 +1,10 @@
 async function sendFile(formData) {
-    const init = {
+    let url = "https://localhost:5001/LoadFiles";
+    let init = {
         method: 'POST',
         body: formData
     }
-    await fetch("https://localhost:5001/LoadFiles", init);
+    await fetch(url, init);
 }
 
 async function uploadFile(file) {

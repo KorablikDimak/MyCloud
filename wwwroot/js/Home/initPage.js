@@ -14,14 +14,14 @@ function initPage() {
 
 function initRedirectToProfileButton() {
     let profileButton = document.getElementById("profile");
-    profileButton.addEventListener("click", ev => {
+    profileButton.addEventListener("click", () => {
         window.location = "Https://localhost:5001/Account/Profile"
     });
 }
 
 function initLogOutButton() {
     let logOutButton = document.getElementById("logOut-button");
-    logOutButton.addEventListener("click", ev => {
+    logOutButton.addEventListener("click", () => {
         logout().then();
     });
 }
@@ -29,7 +29,7 @@ function initLogOutButton() {
 function initSearching() {
     let searchInput = document.getElementById("search-input");
     
-    searchInput.addEventListener("input", ev => {
+    searchInput.addEventListener("input", () => {
         search(searchInput.value.toLowerCase()).then();
     });
 }
@@ -51,14 +51,14 @@ function initShowTypeButtons() {
     tableButton.style.backgroundColor = "#e7e7e7";
     let listButton = document.querySelector(".icon-list-container");
     
-    tableButton.addEventListener("click", evt => {
+    tableButton.addEventListener("click", () => {
         tableButton.style.backgroundColor = "#e7e7e7";
         listButton.style.backgroundColor = "rgba(56,56,56,0)";
         showType = showFileTable;
         updatePage();
     });
     
-    listButton.addEventListener("click", evt => {
+    listButton.addEventListener("click", () => {
         listButton.style.backgroundColor = "#e7e7e7";
         tableButton.style.backgroundColor = "rgba(56,56,56,0)";
         showType = showFileList;
@@ -68,12 +68,12 @@ function initShowTypeButtons() {
 
 function initLoader() {
     let loadInput = document.getElementById("load-file");
-    loadInput.addEventListener("change", ev => loadInputChanged(loadInput));
+    loadInput.addEventListener("change", () => loadInputChanged(loadInput));
 }
 
 function initDeleter() {
     let deleter = document.getElementById("delete-all-files")
-    deleter.addEventListener("click", ev => deleteAllFiles());
+    deleter.addEventListener("click", () => deleteAllFiles());
 }
 
 function initDragDrop() {
@@ -84,11 +84,11 @@ function initDragDrop() {
     });
 
     ;['dragenter', 'dragover'].forEach(eventName => {
-        container.addEventListener(eventName, ev => highlight(container), false);
+        container.addEventListener(eventName, () => highlight(container), false);
     });
 
     ;['dragleave', 'drop'].forEach(eventName => {
-        container.addEventListener(eventName, ev => unhighlight(container), false);
+        container.addEventListener(eventName, () => unhighlight(container), false);
     });
 
     container.addEventListener('drop', handleDrop, false);
@@ -112,13 +112,13 @@ function initSortOptions() {
     let currentSortType = document.getElementById("current-sort-type");
     let arrow = document.getElementById("arrow");
 
-    ASC.addEventListener("click", ev => {
+    ASC.addEventListener("click", () => {
         fileInfoBody.typeOfSort = "ASC";
         arrow.src = "https://localhost:5001/images/free-icon-down-arrow-134210.png";
         updatePage();
     });
 
-    DESC.addEventListener("click", ev => {
+    DESC.addEventListener("click", () => {
         fileInfoBody.typeOfSort = "DESC";
         arrow.src = "https://localhost:5001/images/free-icon-up-arrow-134211.png";
         updatePage();
@@ -127,7 +127,7 @@ function initSortOptions() {
     sortBy.forEach(addClickEvent);
 
     function addClickEvent(sortBy) {
-        sortBy.addEventListener("click", ev => {
+        sortBy.addEventListener("click", () => {
             fileInfoBody.orderBy = sortBy.id;
             currentSortType.innerText = sortBy.innerText;
             updatePage();
@@ -136,7 +136,7 @@ function initSortOptions() {
 }
 
 function sortOptionClicked(dropDownLine) {
-    dropDownLine.addEventListener("click", ev => {
+    dropDownLine.addEventListener("click", () => {
         let otherChosen = document.querySelectorAll(`.${dropDownLine.classList[1].toString()}` + " > .chosen");
         otherChosen.forEach(function (other) {
             other.style.backgroundColor = "rgba(56,56,56,0)";

@@ -21,9 +21,7 @@ async function loadFileInfo() {
         orderBy: fileInfoBody.orderBy,
         typeOfSort: fileInfoBody.typeOfSort
     }
-    console.log(message);
     let response = await sendJsonMessage("https://localhost:5001/GetFileInfo", 'POST', message);
-    console.log(response);
     return await response.json();
 }
 
@@ -35,34 +33,32 @@ async function updateFileContainer() {
 function pullFileContainer(json) {
     let fileContainer = document.getElementById("files");
     for (let i = 0; i < json.length; i++) {
-        const name = json[i].name;
-        const typeOfFile = json[i].typeOfFile;
-        fileContainer.append(showType(name, typeOfFile));
-        updateButtons(name);
+        fileContainer.append(showType(json[i]));
+        updateButtons(json[i].name);
     }
 }
 
-function showFileList(name, typeOfFile) {
+function showFileList(json) {
     let file = document.createElement("div");
     file.className = "file";
     file.classList.add("file-list")
     file.innerHTML = `<div class=\"dropdown-content\">\n` +
-        `<p id=\"load-this-${name}\">Скачать</p>\n` +
-        `<p id=\"delete-this-${name}\">Удалить</p>\n` +
+        `<p id=\"load-this-${json.name}\">Скачать</p>\n` +
+        `<p id=\"delete-this-${json.name}\">Удалить</p>\n` +
         `</div>` +
-        `<div class=\"file-name\">${name}</div>\n`;
+        `<div class=\"file-name\">${json.name}</div>\n`;
     return file;
 }
 
-function showFileTable(name, typeOfFile) {
+function showFileTable(json) {
     let file = document.createElement("div");
     file.className = "file";
     file.innerHTML = `<div class=\"dropdown-content\">\n` +
-        `<p id=\"load-this-${name}\">Скачать</p>\n` +
-        `<p id=\"delete-this-${name}\">Удалить</p>\n` +
+        `<p id=\"load-this-${json.name}\">Скачать</p>\n` +
+        `<p id=\"delete-this-${json.name}\">Удалить</p>\n` +
         `</div>` +
         `<img  alt=\"\" src=\"https://localhost:5001/images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
-        `<div class=\"file-name\">${createCurrentFileName(name, typeOfFile)}</div>\n`;
+        `<div class=\"file-name\">${createCurrentFileName(json.name, json.typeOfFile)}</div>\n`;
     return file;
 }
 
@@ -87,7 +83,7 @@ function createCurrentFileName(fileName, typeOfFile) {
         fileName = currentFileName;
     }
     if (fileName.length > 12){
-        fileName = fileName.slice(0, 11) + "\n" + fileName.slice(11, fileName.length - 1);
+        fileName = fileName.slice(0, 11) + "\n" + fileName.slice(11, fileName.length);
     }
     
     return fileName;

@@ -36,6 +36,14 @@ namespace MyCloud.Controllers
         [HttpPost("LoadFiles")]
         public async Task<IActionResult> LoadFiles(ICollection<IFormFile> files)
         {
+            long size = 0;
+            foreach (var file in files)
+            {
+                size += file.Length;
+            }
+            if (!(GetDirectorySize($"UserFiles\\{User.Identity.Name}") + size <= MaxMemorySize))
+                return new ConflictResult();
+            
             if (!await SetUser(_databaseRequest.DatabaseFilesRequest)) return new ConflictResult();
             bool isSaved =
                 await SaveFiles(_databaseRequest.DatabaseFilesRequest, files, $"UserFiles\\{User.Identity.Name}");
@@ -50,8 +58,7 @@ namespace MyCloud.Controllers
             {
                 string untrustedFileName = Path.GetFileName(file.FileName);
                 string filePath = path + $"\\{untrustedFileName}";
-            
-                if (!IsMemoryFree(path, file.Length)) return false;
+                
                 if (System.IO.File.Exists(filePath)) return false;
                 
                 await using var stream = System.IO.File.Create(filePath);
@@ -86,12 +93,6 @@ namespace MyCloud.Controllers
             if (user == null) return false;
             databaseFilesRequest.User = user;
             return true;
-        }
-
-        private bool IsMemoryFree(string path, long fileSize)
-        {
-            var dirInfo = new DirectoryInfo(path);
-            return dirInfo.GetFiles().Sum(file => file.Length) + fileSize <= MaxMemorySize;
         }
 
         [Authorize]
@@ -225,6 +226,13 @@ namespace MyCloud.Controllers
         [HttpPost("LoadCommonFiles")]
         public async Task<IActionResult> LoadCommonFiles([FromBody] ICollection<IFormFile> files, GroupLogin groupLogin)
         {
+            long size = 0;
+            foreach (var file in files)
+            {
+                size += file.Length;
+            }
+            if (!(await CountCommonMemorySize() + size <= MaxMemorySize)) return new ConflictResult();
+            
             if (!await SetGroup(_databaseRequest.DatabaseCommonFilesRequest, groupLogin)) return new ConflictResult();
             bool isSaved = await SaveFiles(_databaseRequest.DatabaseCommonFilesRequest, files,
                 $"CommonFiles\\{groupLogin.GroupName}");
@@ -257,6 +265,11 @@ namespace MyCloud.Controllers
         [Authorize]
         [HttpGet("GetCommonMemorySize")]
         public async Task<long> GetCommonMemorySize()
+        {
+            return await CountCommonMemorySize();
+        }
+
+        private async Task<long> CountCommonMemorySize()
         {
             List<Group> groups = await _databaseRequest.DatabaseGroupsRequest.FindGroupsInUser(User.Identity.Name);
             long commonMemorySize = 0;

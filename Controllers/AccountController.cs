@@ -69,17 +69,17 @@ namespace MyCloud.Controllers
             bool isAdded = await _databaseRequest.DatabaseUsersRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
             if (!isAdded) return new ConflictResult();
             
-            bool isCreated = CreateUserDirectory(registrationModel.UserName);
+            bool isCreated = CreateDirectory($"UserFiles\\{registrationModel.UserName}");
             if (isCreated) return Ok();
             
             await _databaseRequest.DatabaseUsersRequest.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
             return new ConflictResult();
         }
         
-        private bool CreateUserDirectory(string userName)
+        private bool CreateDirectory(string path)
         {
-            if (Directory.Exists($"UserFiles\\{userName}")) return false;
-            Directory.CreateDirectory($"UserFiles\\{userName}");
+            if (Directory.Exists(path)) return false;
+            Directory.CreateDirectory(path);
             return true;
         }
 
@@ -107,19 +107,19 @@ namespace MyCloud.Controllers
             bool isUserNameChanged = await _databaseRequest.DatabaseUsersRequest.ChangeUserNameAsync(personality, newUserName);
             if (!isUserNameChanged) return new ConflictResult();
             
-            bool isDirectoryChanged = ChangeDirectoryName(User.Identity.Name, newUserName);
+            bool isDirectoryChanged = ChangeDirectoryName("UserFiles", User.Identity.Name, newUserName);
             if (!isDirectoryChanged) return new ConflictResult();
             
             return Ok();
         }
 
-        private bool ChangeDirectoryName(string oldUserName, string newUserName)
+        private bool ChangeDirectoryName(string path, string oldName, string newName)
         {
             try
             {
-                var directoryInfo = new DirectoryInfo($"UserFiles\\{oldUserName}");
+                var directoryInfo = new DirectoryInfo($"{path}\\{oldName}");
                 if (!directoryInfo.Exists) return false;
-                directoryInfo.MoveTo($"UserFiles\\{newUserName}");
+                directoryInfo.MoveTo($"{path}\\{newName}");
             }
             catch (Exception e)
             {
@@ -157,16 +157,16 @@ namespace MyCloud.Controllers
         {
             bool isUserDeleted = await _databaseRequest.DatabaseUsersRequest.DeleteUserAsync(User.Identity.Name, password);
             if (!isUserDeleted) return new ConflictResult();
-            bool isDirectoryDeleted = DeleteUserDirectory(User.Identity.Name);
+            bool isDirectoryDeleted = DeleteDirectory($"UserFiles\\{User.Identity.Name}");
             if (!isDirectoryDeleted) return new ConflictResult();
             return Ok();
         }
 
-        private bool DeleteUserDirectory(string userName)
+        private bool DeleteDirectory(string path)
         {
             try
             {
-                var directoryInfo = new DirectoryInfo($"UserFiles\\{userName}");
+                var directoryInfo = new DirectoryInfo(path);
                 if (!directoryInfo.Exists) return false;
                 directoryInfo.Delete();
             }
@@ -234,9 +234,11 @@ namespace MyCloud.Controllers
         [HttpPost("CreateGroup")]
         public async Task<IActionResult> CreateGroup([FromBody] GroupLogin groupLogin)
         {
+            bool isCreated = CreateDirectory($"CommonFiles\\{groupLogin.GroupName}");
+            if (!isCreated) return new ConflictResult();
             User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
-            bool isCreated = await _databaseRequest.DatabaseGroupsRequest.CreateGroupAsync(groupLogin, user);
+            isCreated = await _databaseRequest.DatabaseGroupsRequest.CreateGroupAsync(groupLogin, user);
             if (isCreated) return Ok();
             return new ConflictResult();
         }
@@ -245,7 +247,9 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteGroup")]
         public async Task<IActionResult> DeleteGroup([FromBody] GroupLogin groupLogin)
         {
-            bool isDeleted = await _databaseRequest.DatabaseGroupsRequest.DeleteGroupAsync(groupLogin);
+            bool isDeleted = DeleteDirectory($"CommonFiles\\{groupLogin.GroupName}");
+            if (!isDeleted) return new ConflictResult();
+            isDeleted = await _databaseRequest.DatabaseGroupsRequest.DeleteGroupAsync(groupLogin);
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
@@ -254,7 +258,11 @@ namespace MyCloud.Controllers
         [HttpPatch("ChangeGroupName")]
         public async Task<IActionResult> ChangeGroupLogin([FromBody] GroupLogin[] groupLogin)
         {
-            bool isChanged = await _databaseRequest.DatabaseGroupsRequest.ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
+            bool isChanged = ChangeDirectoryName("CommonFiles", 
+                groupLogin[0].GroupName, 
+                groupLogin[1].GroupName);
+            if (!isChanged) return new ConflictResult();
+            isChanged = await _databaseRequest.DatabaseGroupsRequest.ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
             if (isChanged) return Ok();
             return new ConflictResult();
         }

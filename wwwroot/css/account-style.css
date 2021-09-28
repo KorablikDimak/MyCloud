@@ -85,3 +85,16 @@ a {
 #registration-button {
     width: 100%;
 }
+
+.drop-text {
+    text-align: center;
+    padding: 10px 20px;
+    display: none;
+    font-family: sans-serif;
+    color: #d31d1c;
+    font-size: 22px;
+}
+
+.drop-text.highlight {
+    display: block;
+}

@@ -13,13 +13,8 @@ async function updatePage() {
     name.innerText = json.name;
     username.innerText = json.userName;
     id.innerText = `Ваш id: ${json.id}`;
-    
-    let userPhoto = document.getElementById("photo");
-    sendJsonMessage("https://localhost:5001/GetUserPhotoUrl", 'GET').then(response => {
-        response.text().then(text => {
-            userPhoto.src = text;
-        });
-    });
+
+    getUserPhoto("photo");
     
     document.getElementById("surname-input").value = json.surname;
     document.getElementById("name-input").value = json.name;

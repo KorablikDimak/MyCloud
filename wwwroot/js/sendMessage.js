@@ -34,3 +34,24 @@ async function logout() {
     await sendJsonMessage("https://localhost:5001/Logout", 'GET');
     window.location = "https://localhost:5001/Account/Login";
 }
+
+function getUserPhoto(userPhotoId) {
+    let userPhoto = document.getElementById(userPhotoId);
+    sendJsonMessage("https://localhost:5001/GetUserPhotoUrl", 'GET').then(response => {
+        response.text().then(text => {
+            userPhoto.src = text;
+        });
+    });
+}
+
+async function isNameUsed(name) {
+    if (name.length > 3) {
+        let response = await sendJsonMessage("https://localhost:5001/IsUserNameUsed", 'POST', name)
+        let json = await response.json();
+        if (json === true) {
+            dropTextLogin.classList.add("highlight");
+            dropTextLogin.innerText = "Данное имя занято";
+        }
+        console.log(json);
+    }
+}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using MyCloud.Models.User;
 
 namespace MyCloud.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly IDatabaseRequest _databaseRequest;
@@ -23,12 +25,14 @@ namespace MyCloud.Controllers
             _databaseRequest = accountDataRequestBuilder.DatabaseRequest;
         }
         
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
@@ -55,17 +59,18 @@ namespace MyCloud.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
         
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Registration()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost("Registration")]
         public async Task<IActionResult> Registration([FromBody] RegistrationModel registrationModel)
         {
             if (!ModelState.IsValid) return new ForbidResult();
-            if (registrationModel.Password != registrationModel.ConfirmPassword) return new ConflictResult();
             
             bool isAdded = await _databaseRequest.DatabaseUsersRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
             if (!isAdded) return new ConflictResult();
@@ -76,6 +81,14 @@ namespace MyCloud.Controllers
             await _databaseRequest.DatabaseUsersRequest.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
             return new ConflictResult();
         }
+
+        [AllowAnonymous]
+        [HttpPost("IsUserNameUsed")]
+        public async Task<bool> IsUserNameUsed([FromBody] string userName)
+        {
+            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(userName);
+            return user != null;
+        }
         
         private bool CreateDirectory(string path)
         {
@@ -83,25 +96,24 @@ namespace MyCloud.Controllers
             Directory.CreateDirectory(path);
             return true;
         }
-
-        [Authorize]
+        
         [HttpGet]
         public IActionResult Profile()
         {
             return View();
         }
-
-        [Authorize]
+        
         [HttpGet("GetPersonality")]
         public async Task<Personality> GetPersonality()
         {
             return await _databaseRequest.DatabasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
         }
-
-        [Authorize]
+        
         [HttpPatch("ChangeUserName")]
-        public async Task<IActionResult> ChangeUserName([FromBody] string newUserName)
+        public async Task<IActionResult> ChangeUserName([FromBody][StringLength(20, MinimumLength = 3)] string newUserName)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
+            
             Personality personality = await _databaseRequest.DatabasePersonalityRequest.FindPersonalityAsync(User.Identity.Name);
             if (personality == null) return new ConflictResult();
             
@@ -130,21 +142,21 @@ namespace MyCloud.Controllers
 
             return true;
         }
-
-        [Authorize]
+        
         [HttpPatch("ChangePersonality")]
         public async Task<IActionResult> ChangePersonality([FromBody] Personality newPersonality)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             bool isChanged = await _databaseRequest.DatabasePersonalityRequest
                 .ChangePersonalityAsync(User.Identity.Name, newPersonality);
             if (isChanged) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpPatch("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel passwordModel)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             bool isChanged = await _databaseRequest.DatabaseUsersRequest.ChangePasswordAsync(
                 User.Identity.Name, 
                 passwordModel.OldPassword, 
@@ -153,10 +165,10 @@ namespace MyCloud.Controllers
             return Ok();
         }
         
-        [Authorize]
         [HttpDelete("DeleteAccount")]
-        public async Task<IActionResult> DeleteAccount([FromBody] string password)
+        public async Task<IActionResult> DeleteAccount([FromBody][StringLength(20, MinimumLength = 3)] string password)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             bool isUserDeleted = await _databaseRequest.DatabaseUsersRequest
                 .DeleteUserAsync(User.Identity.Name, password);
             if (!isUserDeleted) return new ConflictResult();
@@ -181,15 +193,13 @@ namespace MyCloud.Controllers
             
             return true;
         }
-
-        [Authorize]
+        
         [HttpGet]
         public IActionResult MyGroups()
         {
             return View();
         }
-
-        [Authorize]
+        
         [HttpGet("FindMyGroups")]
         public async Task<List<GroupLogin>> FindMyGroups()
         {
@@ -197,11 +207,11 @@ namespace MyCloud.Controllers
                 new List<GroupLogin>(await _databaseRequest.DatabaseGroupsRequest.FindGroupsInUser(User.Identity.Name));
             return groups;
         }
-
-        [Authorize]
+        
         [HttpPost("FindUsersInGroup")]
         public async Task<List<Personality>> FindUsersInGroup([FromBody] GroupLogin groupLogin)
         {
+            if (!ModelState.IsValid) return new List<Personality>();
             List<Personality> personalities = new List<Personality>();
             List<User> users = await _databaseRequest.DatabaseUsersRequest.FindUsersInGroup(groupLogin);
             foreach (var user in users)
@@ -213,33 +223,33 @@ namespace MyCloud.Controllers
 
             return personalities;
         }
-
-        [Authorize]
+        
         [HttpPost("EnterInGroup")]
         public async Task<IActionResult> EnterInGroup([FromBody] GroupLogin groupLogin)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
             bool isEntered = await _databaseRequest.DatabaseGroupsRequest.AddUserInGroupAsync(groupLogin, user);
             if (isEntered) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpDelete("LeaveFromGroup")]
         public async Task<IActionResult> LeaveFromGroup([FromBody] GroupLogin groupLogin)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
             bool isLeave = await _databaseRequest.DatabaseGroupsRequest.RemoveUserFromGroupAsync(groupLogin, user);
             if (isLeave) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpPost("CreateGroup")]
         public async Task<IActionResult> CreateGroup([FromBody] GroupLogin groupLogin)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             bool isCreated = CreateDirectory($"CommonFiles\\{groupLogin.Name}");
             if (!isCreated) return new ConflictResult();
             User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
@@ -248,22 +258,22 @@ namespace MyCloud.Controllers
             if (isCreated) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpDelete("DeleteGroup")]
         public async Task<IActionResult> DeleteGroup([FromBody] GroupLogin groupLogin)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             bool isDeleted = DeleteDirectory($"CommonFiles\\{groupLogin.Name}");
             if (!isDeleted) return new ConflictResult();
             isDeleted = await _databaseRequest.DatabaseGroupsRequest.DeleteGroupAsync(groupLogin);
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpPatch("ChangeGroupName")]
         public async Task<IActionResult> ChangeGroupLogin([FromBody] GroupLogin[] groupLogin)
         {
+            if (!ModelState.IsValid) return new ForbidResult();
             bool isChanged = ChangeDirectoryName("CommonFiles", 
                 groupLogin[0].Name, 
                 groupLogin[1].Name);
@@ -273,8 +283,7 @@ namespace MyCloud.Controllers
             if (isChanged) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpPost("SetUserPhoto")]
         public async Task<IActionResult> SetUserPhoto(IFormFile image)
         {
@@ -313,8 +322,7 @@ namespace MyCloud.Controllers
 
             return true;
         }
-
-        [Authorize]
+        
         [HttpGet("GetUserPhotoUrl")]
         public async Task<string> GetUserPhotoUrl()
         {

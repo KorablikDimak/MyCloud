@@ -235,3 +235,16 @@ body {
     color: white;
     background-position: bottom left;
 }
+
+.drop-text {
+    text-align: center;
+    padding: 10px 20px;
+    display: none;
+    font-family: sans-serif;
+    color: #d31d1c;
+    font-size: 22px;
+}
+
+.drop-text.highlight {
+    display: block;
+}

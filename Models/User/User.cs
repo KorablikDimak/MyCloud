@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MyCloud.Models.MyFile;
 
 namespace MyCloud.Models.User
@@ -6,7 +7,11 @@ namespace MyCloud.Models.User
     public class User
     {
         public int Id { get; set; }
+        [Required]
+        [StringLength(20, MinimumLength = 3)]
         public string UserName { get; set; }
+        [Required]
+        [StringLength(20, MinimumLength = 8)]
         public string Password { get; set; }
         public ICollection<MyFileInfo> Files { get; set; }
         public PersonalityData PersonalityData { get; set; }

@@ -11,7 +11,40 @@ let confirmButtons = [confirmChangeButton, confirmCreateButton, confirmDeleteBut
 
 initPage().then();
 
-async function initPage() {    
+async function initPage() {   
+    let groupName = document.getElementById("group-name");
+    let dropTextLogin = document.getElementById("drop-text-login");
+    groupName.addEventListener("input", () => {
+        if (groupName.value.length < 3) {
+            dropTextLogin.classList.add("highlight");
+            dropTextLogin.innerText = "Минимальная длина: 3 символа";
+        }
+        else if (groupName.value.length > 20) {
+            dropTextLogin.classList.add("highlight");
+            dropTextLogin.innerText = "Максимальная длина: 20 символов";
+        }
+        else {
+            dropTextLogin.classList.remove("highlight");
+        }
+        isNameUsed(groupName.value).then();
+    });
+    
+    let groupPassword = document.getElementById("group-password");
+    let dropTextPassword = document.getElementById("drop-text-password");
+    groupPassword.addEventListener("input", () => {
+        if (groupPassword.value.length < 8) {
+            dropTextPassword.classList.add("highlight");
+            dropTextPassword.innerText = "Минимальная длина: 8 символов";
+        }
+        else if (groupPassword.value.length > 20) {
+            dropTextPassword.classList.add("highlight");
+            dropTextPassword.innerText = "Максимальная длина: 20 символов";
+        }
+        else {
+            dropTextPassword.classList.remove("highlight");
+        }
+    });
+    
     let exitButton = document.querySelector(".exit-button");
     exitButton.addEventListener("click", () => {
         window.location = "https://localhost:5001/Account/Profile";

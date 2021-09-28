@@ -91,6 +91,7 @@ class PageUpdater {
         }
         this._memoryCounter.showFreeMemory().then();
         this._container.pullContainer();
+        getUserPhoto("user-photo");
     }
     
      _createCurrentContent(content) {

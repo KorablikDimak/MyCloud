@@ -14,6 +14,7 @@ using MyCloud.Models.User;
 
 namespace MyCloud.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private const long MaxMemorySize = 10737418240;
@@ -24,14 +25,12 @@ namespace MyCloud.Controllers
             _databaseRequest = homeDataRequestBuilder.DatabaseRequest;
         }
         
-        [Authorize]
         [HttpGet]
         public IActionResult MyFiles()
         {
             return View();
         }
-
-        [Authorize]
+        
         [RequestSizeLimit(1073741824)]
         [HttpPost("LoadFiles")]
         public async Task<IActionResult> LoadFiles(ICollection<IFormFile> files)
@@ -94,8 +93,7 @@ namespace MyCloud.Controllers
             databaseFilesRequest.User = user;
             return true;
         }
-
-        [Authorize]
+        
         [HttpPost("GetFileInfo")]
         public async Task<List<MyFileInfo>> GetFileInfo([FromBody] SortType sortType)
         {
@@ -125,8 +123,7 @@ namespace MyCloud.Controllers
                 TypeOfFile = file.TypeOfFile
             }).ToList();
         }
-
-        [Authorize]
+        
         [RequestSizeLimit(1073741824)]
         [HttpPost("GetVirtualFile")]
         public VirtualFileResult GetVirtualFile([FromBody] string fileName)
@@ -139,8 +136,7 @@ namespace MyCloud.Controllers
             string filepath = Path.Combine(path, fileName);
             return File(filepath, "application/octet-stream", fileName);
         }
-
-        [Authorize]
+        
         [HttpDelete("DeleteOneFile")]
         public async Task<IActionResult> DeleteOneFile([FromBody] string fileName)
         {
@@ -159,8 +155,7 @@ namespace MyCloud.Controllers
             System.IO.File.Delete(filepath);
             return true;
         }
-
-        [Authorize]
+        
         [HttpDelete("DeleteAllFiles")]
         public async Task<IActionResult> DeleteAllFiles()
         {
@@ -184,8 +179,7 @@ namespace MyCloud.Controllers
 
             return true;
         }
-
-        [Authorize]
+        
         [HttpGet("GetMemorySize")]
         public long GetMemorySize()
         {
@@ -197,16 +191,14 @@ namespace MyCloud.Controllers
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.GetFiles().Sum(file => file.Length);
         }
-
-        [Authorize]
+        
         [HttpGet("Logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Ok();
         }
-
-        [Authorize]
+        
         [HttpPost("GetCommonFileInfo")]
         public async Task<List<MyFileInfo>> GetCommonFileInfo([FromBody] SortType sortType,
             [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
@@ -228,7 +220,6 @@ namespace MyCloud.Controllers
             return true;
         }
         
-        [Authorize]
         [RequestSizeLimit(1073741824)]
         [HttpPost("GetCommonVirtualFile")]
         public async Task<VirtualFileResult> GetCommonVirtualFile([FromBody] string fileName, 
@@ -243,8 +234,7 @@ namespace MyCloud.Controllers
             if (group == null) return null;
             return GetFile(fileName, $"~/CommonFiles/{group.Name}");
         }
-
-        [Authorize]
+        
         [HttpPost("LoadCommonFiles")]
         public async Task<IActionResult> LoadCommonFiles(ICollection<IFormFile> files, 
             [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
@@ -267,8 +257,7 @@ namespace MyCloud.Controllers
             if (isSaved) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpDelete("DeleteOneCommonFile")]
         public async Task<IActionResult> DeleteOneCommonFile([FromBody] string fileName,
             [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
@@ -284,8 +273,7 @@ namespace MyCloud.Controllers
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpDelete("DeleteAllCommonFiles")]
         public async Task<IActionResult> DeleteAllCommonFiles(
             [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
@@ -301,8 +289,7 @@ namespace MyCloud.Controllers
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
-
-        [Authorize]
+        
         [HttpGet("GetCommonMemorySize")]
         public async Task<long> GetCommonMemorySize()
         {

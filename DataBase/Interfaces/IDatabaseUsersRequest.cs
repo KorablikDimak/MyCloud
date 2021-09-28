@@ -13,5 +13,7 @@ namespace MyCloud.DataBase.Interfaces
         public Task<bool> DeleteUserAsync(string userName, string password);
         public Task<bool> ChangePasswordAsync(string userName, string oldPassword, string newPassword);
         public Task<bool> ChangeUserNameAsync(Personality personality, string newUserName);
+        public Task<bool> SetIcon(string userName, string iconName);
+        public Task<string> GetIcon(string userName);
     }
 }

@@ -128,5 +128,28 @@ namespace MyCloud.DataBase
 
             return true;
         }
+
+        public async Task<bool> SetIcon(string userName, string iconName)
+        {
+            try
+            {
+                User user = await FindUserAsync(userName);
+                user.IconName = iconName;
+                await _databaseContext.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<string> GetIcon(string userName)
+        {
+            User user = await FindUserAsync(userName);
+            return user.IconName;
+        }
     }
 }

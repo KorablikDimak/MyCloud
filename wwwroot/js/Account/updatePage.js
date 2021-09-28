@@ -1,3 +1,5 @@
+updatePage().then();
+
 async function updatePage() {
     let response = await sendJsonMessage("https://localhost:5001/GetPersonality", 'GET');
     let json = await response.json();
@@ -10,7 +12,14 @@ async function updatePage() {
     surname.innerText = json.surname;
     name.innerText = json.name;
     username.innerText = json.userName;
-    id.innerText = json.id;
+    id.innerText = `Ваш id: ${json.id}`;
+    
+    let userPhoto = document.getElementById("photo");
+    sendJsonMessage("https://localhost:5001/GetUserPhotoUrl", 'GET').then(response => {
+        response.text().then(text => {
+            userPhoto.src = text;
+        });
+    });
     
     document.getElementById("surname-input").value = json.surname;
     document.getElementById("name-input").value = json.name;

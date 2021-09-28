@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyCloud.DataBase.DataRequestBuilder;
 using MyCloud.Models.Login;
@@ -271,6 +272,58 @@ namespace MyCloud.Controllers
                 .ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
             if (isChanged) return Ok();
             return new ConflictResult();
+        }
+
+        [Authorize]
+        [HttpPost("SetUserPhoto")]
+        public async Task<IActionResult> SetUserPhoto(IFormFile image)
+        {
+            bool isDeleted = await DeleteOldIcon();
+            if (!isDeleted) return new ConflictResult();
+            bool isSet = await SetNewIcon(image);
+            if (!isSet) return new ConflictResult();
+            return Ok();
+        }
+
+        private async Task<bool> SetNewIcon(IFormFile image)
+        {
+            string iconName = $"{User.Identity.Name}.{image.FileName}";
+            bool isSet = await _databaseRequest.DatabaseUsersRequest
+                .SetIcon(User.Identity.Name, iconName);
+            if (!isSet) return false;
+            string filePath = $"wwwroot\\UserIcons\\{iconName}";
+            await using var stream = System.IO.File.Create(filePath);
+            await image.CopyToAsync(stream);
+            return true;
+        }
+
+        private async Task<bool> DeleteOldIcon()
+        {
+            try
+            {
+                string iconName = await _databaseRequest.DatabaseUsersRequest.GetIcon(User.Identity.Name);
+                if (!System.IO.File.Exists($"wwwroot\\UserIcons\\{iconName}")) return true;
+                System.IO.File.Delete($"wwwroot\\UserIcons\\{iconName}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return true;
+        }
+
+        [Authorize]
+        [HttpGet("GetUserPhotoUrl")]
+        public async Task<string> GetUserPhotoUrl()
+        {
+            string iconName = await _databaseRequest.DatabaseUsersRequest.GetIcon(User.Identity.Name);
+            if (System.IO.File.Exists($"wwwroot\\UserIcons\\{iconName}"))
+            {
+                return $"https://localhost:5001/UserIcons/{iconName}";
+            }
+            return "https://localhost:5001/images/free-icon-user-149452.png";
         }
     }
 }

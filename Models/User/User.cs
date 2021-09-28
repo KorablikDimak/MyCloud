@@ -11,6 +11,7 @@ namespace MyCloud.Models.User
         public ICollection<MyFileInfo> Files { get; set; }
         public PersonalityData PersonalityData { get; set; }
         public ICollection<Group> Groups { get; set; }
+        public string IconName { get; set; }
 
         public User()
         {

@@ -21,6 +21,7 @@
     <ItemGroup>
       <Folder Include="CommonFiles" />
       <Folder Include="UserFiles" />
+      <Folder Include="wwwroot\UserIcons" />
     </ItemGroup>
 
     <ItemGroup>

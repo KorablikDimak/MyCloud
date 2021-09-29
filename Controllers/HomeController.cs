@@ -126,15 +126,16 @@ namespace MyCloud.Controllers
         
         [RequestSizeLimit(1073741824)]
         [HttpPost("GetVirtualFile")]
-        public VirtualFileResult GetVirtualFile([FromBody] string fileName)
+        public IActionResult GetVirtualFile([FromBody] string fileName)
         {
-            return GetFile(fileName, $"~/UserFiles/{User.Identity.Name}");
+            return GetFile(fileName, $"UserFiles\\{User.Identity.Name}");
         }
 
-        private VirtualFileResult GetFile(string fileName, string path)
+        private IActionResult GetFile(string fileName, string path)
         {
             string filepath = Path.Combine(path, fileName);
-            return File(filepath, "application/octet-stream", fileName);
+            Stream fileStream = new FileStream(filepath, FileMode.Open);
+            return File(fileStream, "application/octet-stream");
         }
         
         [HttpDelete("DeleteOneFile")]
@@ -222,7 +223,7 @@ namespace MyCloud.Controllers
         
         [RequestSizeLimit(1073741824)]
         [HttpPost("GetCommonVirtualFile")]
-        public async Task<VirtualFileResult> GetCommonVirtualFile([FromBody] string fileName, 
+        public async Task<IActionResult> GetCommonVirtualFile([FromBody] string fileName, 
             [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)
         {
             GroupLogin groupLogin = new GroupLogin
@@ -232,7 +233,7 @@ namespace MyCloud.Controllers
             };
             Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
             if (group == null) return null;
-            return GetFile(fileName, $"~/CommonFiles/{group.Name}");
+            return GetFile(fileName, $"CommonFiles\\{group.Name}");
         }
         
         [HttpPost("LoadCommonFiles")]

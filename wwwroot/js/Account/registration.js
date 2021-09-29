@@ -52,7 +52,7 @@ registrationButton.addEventListener("click", () => {
         ConfirmPassword: confirmPasswordInput.value
     }
     
-    sendJsonMessage("https://localhost:5001/Registration", 'POST', message)
-        .then(() => {window.location = "https://localhost:5001/Account/Login";
+    sendJsonMessage("https://192.168.1.130/Registration", 'POST', message)
+        .then(() => {window.location = "https://192.168.1.130/Account/Login";
     });
 });

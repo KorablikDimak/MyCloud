@@ -1,7 +1,7 @@
 updatePage().then();
 
 async function updatePage() {
-    let response = await sendJsonMessage("https://localhost:5001/GetPersonality", 'GET');
+    let response = await sendJsonMessage("https://192.168.1.130/GetPersonality", 'GET');
     let json = await response.json();
     
     let surname = document.getElementById("surname");

@@ -29,10 +29,10 @@ class PageUpdater {
         
         if (confirm("Вы уверены, что хотите удалить все файлы?")) {
             if (this.typeOfPage === "commonFiles") {
-                await sendCommonJsonMessage("https://localhost:5001/DeleteAllCommonFiles", 'DELETE');
+                await sendCommonJsonMessage("https://192.168.1.130/DeleteAllCommonFiles", 'DELETE');
             }
             else if (this.typeOfPage === "myFiles") {
-                await sendJsonMessage("https://localhost:5001/DeleteAllFiles", 'DELETE');
+                await sendJsonMessage("https://192.168.1.130/DeleteAllFiles", 'DELETE');
             }
             updatePage();
         }
@@ -40,11 +40,11 @@ class PageUpdater {
     
     async loadFiles(loadInput) {
         if (this.typeOfPage === "commonFiles") {
-            this._memoryCounter.url = "https://localhost:5001/GetCommonMemorySize";
+            this._memoryCounter.url = "https://192.168.1.130/GetCommonMemorySize";
             await this._loadFiles(loadInput, this._fileLoader.loadCommonFile);
         }
         else if (this.typeOfPage === "myFiles") {
-            this._memoryCounter.url = "https://localhost:5001/GetMemorySize";
+            this._memoryCounter.url = "https://192.168.1.130/GetMemorySize";
             await this._loadFiles(loadInput, this._fileLoader.loadFile);
         }
     }
@@ -78,7 +78,7 @@ class PageUpdater {
     
     async updatePage() {
         this._container.clearContainer();
-        this._memoryCounter.url = "https://localhost:5001/GetCommonMemorySize";
+        this._memoryCounter.url = "https://192.168.1.130/GetCommonMemorySize";
         if (this.typeOfPage === "commonFiles") {
             await this._updateCommonFiles();
         }
@@ -86,7 +86,7 @@ class PageUpdater {
             await this._updateGroups();
         }
         else {
-            this._memoryCounter.url = "https://localhost:5001/GetMemorySize";
+            this._memoryCounter.url = "https://192.168.1.130/GetMemorySize";
             await this._updateMyFiles();
         }
         this._memoryCounter.showFreeMemory().then();

@@ -1,5 +1,5 @@
 class MemoryCounter {
-    url = "https://localhost:5001/GetMemorySize";
+    url = "https://192.168.1.130/GetMemorySize";
     _freeSize;
     
     async showFreeMemory() {

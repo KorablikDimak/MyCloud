@@ -7,11 +7,11 @@ loginButton.addEventListener("click", () => {
         Password: document.getElementById("password-input").value
     };
     
-    sendJsonMessage("https://localhost:5001/Login", 'POST', message)
+    sendJsonMessage("https://192.168.1.130/Login", 'POST', message)
         .then((response) => {
             console.log(response.status);
             if (response.status === 200) {
-                window.location = "https://localhost:5001/Home/MyFiles";
+                window.location = "https://192.168.1.130/Home/MyFiles";
             }
             else {
                 dropTextLogin.classList.add("highlight");

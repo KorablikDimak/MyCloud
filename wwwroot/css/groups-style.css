@@ -248,3 +248,32 @@ body {
 .drop-text.highlight {
     display: block;
 }
+
+@media (max-width: 1200px) {
+    .container {
+        max-width: 970px;
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        max-width: 750px;
+    }
+}
+
+@media (max-width: 767px) {
+    .container {
+        display: block;
+        max-width: none;
+    }
+    .users, .groups {
+        width: auto;
+    }
+    .left-container, .center-container {
+        width: auto;
+        padding: 20px 20px 10px;
+    }
+    .right-container {
+        width: auto;
+    }
+}

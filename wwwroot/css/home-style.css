@@ -11,8 +11,9 @@ body {
 }
 
 .container {
+    max-width: 1200px;
     transition: all 0.3s ease-in-out;
-    margin: 1% 1%;
+    margin: 1% auto;
     border: 4px dashed rgba(113,113,113,0);
     padding: 0.5%;
     border-radius: 20px;
@@ -486,4 +487,31 @@ body {
 .file:hover .dropdown-content {
     opacity: 1;
     z-index: 5;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        max-width: 970px;
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        max-width: 750px;
+    }
+}
+
+@media (max-width: 767px) {
+    .container {
+        max-width: none;
+    }
+    .main-container {
+        display: block;
+    }
+    .left-slider {
+        width: auto;
+    }
+    .center {
+        width: auto;
+    }
 }

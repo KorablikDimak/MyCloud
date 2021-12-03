@@ -28,6 +28,11 @@ It also supports client-side validation. Many actions do not require contacting 
   - upload files in the usual way at the click of a button
   - download with `drag and drop`
   - delete individual files or download them to your computer
+## How to run the application on your computer
+- add the line `"ConnectionStrings": {"DefaultConnection": "Data Source=here must be connection string to your database"}` in `appsettings.json`
+- if you run the application not on `localhost:5001` then you need to change const `siteAddress` in `wwwroot/js/sendMessage.js` to the site address you need
+- for greater security, I recommend making the directory `UserFiles` virtual
+- by default, there is a limit on the amount of uploaded files of 1024 MB and on the total disk space of each user at 10240 MB. You can change this by changing the constants `maxSize` and `requestLimit` in `wwwroot/js/Home/MemoryCounter.js` and constans `MaxMemorySize` and `RequestSizeLimit` in `Controllers/HomeController.cs`
 ## Integration with desktop application
 We are planning to write an application using `WPF` technology using an existing api. 
 It looks good to use the `git` version control system for the subsequent uploading of repositories to the site.

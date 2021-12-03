@@ -15,6 +15,7 @@ Performed on a mixture of **javascript html** and **css**.
 It also supports client-side validation. Many actions do not require contacting the server.
 **Asynchrony** is involved so that the user interface is not blocked during requests.
 ## Peculiarities
+![screenMainPage](https://github.com/KorablikDimak/MyCloud/raw/master/screenMainPage.png)
 - User authorization
   - each user has his own unique user name
   - each user logs in with their own password and can only have access to their own files

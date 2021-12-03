@@ -29,10 +29,10 @@ class PageUpdater {
         
         if (confirm("Вы уверены, что хотите удалить все файлы?")) {
             if (this.typeOfPage === "commonFiles") {
-                await sendCommonJsonMessage("https://192.168.1.130/DeleteAllCommonFiles", 'DELETE');
+                await sendCommonJsonMessage(siteAddress + "DeleteAllCommonFiles", 'DELETE');
             }
             else if (this.typeOfPage === "myFiles") {
-                await sendJsonMessage("https://192.168.1.130/DeleteAllFiles", 'DELETE');
+                await sendJsonMessage(siteAddress + "DeleteAllFiles", 'DELETE');
             }
             updatePage();
         }
@@ -40,11 +40,11 @@ class PageUpdater {
     
     async loadFiles(loadInput) {
         if (this.typeOfPage === "commonFiles") {
-            this._memoryCounter.url = "https://192.168.1.130/GetCommonMemorySize";
+            this._memoryCounter.url = siteAddress + "GetCommonMemorySize";
             await this._loadFiles(loadInput, this._fileLoader.loadCommonFile);
         }
         else if (this.typeOfPage === "myFiles") {
-            this._memoryCounter.url = "https://192.168.1.130/GetMemorySize";
+            this._memoryCounter.url = siteAddress + "GetMemorySize";
             await this._loadFiles(loadInput, this._fileLoader.loadFile);
         }
     }
@@ -54,8 +54,8 @@ class PageUpdater {
         for (let i = 0; i < loadInput.files.length; i++) {
             sizeOfFiles += loadInput.files[i].size;
         }
-        if (sizeOfFiles < 1073741824){
-            if (10737418240 - await this._memoryCounter.getMemorySize() >= sizeOfFiles) {
+        if (sizeOfFiles < requestLimit * 1024 * 1024){
+            if (maxSize * 1024 * 1024 - await this._memoryCounter.getMemorySize() >= sizeOfFiles) {
                 for (let i = 0; i < loadInput.files.length; i++) {
                     await loadFile(loadInput.files[i]);
                 }
@@ -65,7 +65,7 @@ class PageUpdater {
             }
         }
         else {
-            window.alert("Общий объем загружаемых файлов не должен превышать 1гб");
+            window.alert(`Общий объем загружаемых файлов не должен превышать ${requestLimit} мб`);
         }
     }
     
@@ -78,7 +78,7 @@ class PageUpdater {
     
     async updatePage() {
         this._container.clearContainer();
-        this._memoryCounter.url = "https://192.168.1.130/GetCommonMemorySize";
+        this._memoryCounter.url = siteAddress + "GetCommonMemorySize";
         if (this.typeOfPage === "commonFiles") {
             await this._updateCommonFiles();
         }
@@ -86,7 +86,7 @@ class PageUpdater {
             await this._updateGroups();
         }
         else {
-            this._memoryCounter.url = "https://192.168.1.130/GetMemorySize";
+            this._memoryCounter.url = siteAddress + "GetMemorySize";
             await this._updateMyFiles();
         }
         this._memoryCounter.showFreeMemory().then();

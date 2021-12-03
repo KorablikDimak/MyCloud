@@ -47,7 +47,7 @@ async function initPage() {
     
     let exitButton = document.querySelector(".exit-button");
     exitButton.addEventListener("click", () => {
-        window.location = "https://192.168.1.130/Account/Profile";
+        window.location = siteAddress + "Account/Profile";
     });
     
     groupWindow.addEventListener("click", ev => {
@@ -91,7 +91,7 @@ async function initPage() {
                 GroupPassword: newPassword
             }];
         console.log(message);
-        sendJsonMessage("https://192.168.1.130/ChangeGroupName", 'Patch', message).then(response => {
+        sendJsonMessage(siteAddress + "ChangeGroupName", 'Patch', message).then(response => {
             if (response.status === 200) {
                 updatePage().then();
             }
@@ -130,7 +130,7 @@ async function initPage() {
     let confirmLeaveButton = document.getElementById("leave-group");
     confirmLeaveButton.addEventListener("click", () => {
         if (confirm("Вы уверены, что хотите покинуть группу?")) {
-            sendMessage("https://192.168.1.130/LeaveFromGroup", 'DELETE').then(response => {
+            sendMessage(siteAddress + "LeaveFromGroup", 'DELETE').then(response => {
                 if (response.status === 200) {
                     updatePage().then();
                 }
@@ -167,15 +167,15 @@ async function updatePage() {
 }
 
 async function enterTheGroup() {
-    return await sendMessage("https://192.168.1.130/EnterInGroup", 'POST');
+    return await sendMessage(siteAddress + "EnterInGroup", 'POST');
 }
 
 async function deleteGroup() {
-    return await sendMessage("https://192.168.1.130/DeleteGroup", 'DELETE');
+    return await sendMessage(siteAddress + "DeleteGroup", 'DELETE');
 }
 
 async function createGroup() {
-    return await sendMessage("https://192.168.1.130/CreateGroup", 'POST');
+    return await sendMessage(siteAddress + "CreateGroup", 'POST');
 }
 
 async function sendMessage(url, method) {
@@ -203,7 +203,7 @@ function clearGroups() {
 }
 
 async function updateGroups() {
-    let response = await sendJsonMessage("https://192.168.1.130/FindMyGroups", 'GET');
+    let response = await sendJsonMessage(siteAddress + "FindMyGroups", 'GET');
     let json = await response.json();
     updateGroupData(json[0].name, json[0].groupPassword);
     json.forEach(addGroup);
@@ -231,7 +231,7 @@ function clearUsers() {
 }
 
 async function updateUsers() {
-    let response = await sendMessage("https://192.168.1.130/FindUsersInGroup", 'POST');
+    let response = await sendMessage(siteAddress + "FindUsersInGroup", 'POST');
     let json = await response.json();
     json.forEach(addUser);
 }

@@ -12,7 +12,7 @@ async function setUserPhoto(file) {
         method: 'POST',
         body: formData
     };
-    await fetch("https://192.168.1.130/SetUserPhoto", init);
+    await fetch(siteAddress + "SetUserPhoto", init);
     await updatePage();
 }
 
@@ -48,7 +48,7 @@ async function changePersonality() {
         Surname: document.getElementById("surname-input").value,
         Name: document.getElementById("name-input").value,
     }
-    let response = await sendJsonMessage("https://192.168.1.130/ChangePersonality", 'PATCH', message)
+    let response = await sendJsonMessage(siteAddress + "ChangePersonality", 'PATCH', message)
     if (response.status === 200) {
         await changeUserName();
     }
@@ -58,7 +58,7 @@ async function changeUserName() {
     let message = document.getElementById("username-input").value;
     let userName = document.getElementById("username").value;
     if (message !== userName) {
-        let response = await sendJsonMessage("https://192.168.1.130/ChangeUserName", 'PATCH', message);
+        let response = await sendJsonMessage(siteAddress + "ChangeUserName", 'PATCH', message);
         if (response.status === 200) {
             await logout();
         }
@@ -67,12 +67,12 @@ async function changeUserName() {
 
 let myFiles = document.getElementById("my-files");
 myFiles.addEventListener("click", () => {
-    window.location = "https://192.168.1.130/Home/MyFiles";
+    window.location = siteAddress + "Home/MyFiles";
 });
 
 let groupsView = document.getElementById("groups-view");
 groupsView.addEventListener("click", () => {
-    window.location = "https://192.168.1.130/Account/MyGroups";
+    window.location = siteAddress + "Account/MyGroups";
 });
 
 let confirmButton = document.getElementById("confirm");
@@ -84,7 +84,7 @@ confirmButton.addEventListener("click", () => {
         OldPassword: document.getElementById("old-password").value,
         NewPassword: document.getElementById("new-password").value
     };
-    sendJsonMessage("https://192.168.1.130/ChangePassword", 'PATCH', message).then(response => {
+    sendJsonMessage(siteAddress + "ChangePassword", 'PATCH', message).then(response => {
         if (response.status === 200) logout().then();
     });
 });
@@ -125,6 +125,6 @@ confirm.addEventListener("click", () => {
 
 async function deleteAccount() {
     let message = document.getElementById("password-delete-input").value;
-    let response = await sendJsonMessage("https://192.168.1.130/DeleteAccount", "DELETE", message)
+    let response = await sendJsonMessage(siteAddress + "DeleteAccount", "DELETE", message)
     if (response.status === 200) await logout();
 }

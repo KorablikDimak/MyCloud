@@ -1,3 +1,5 @@
+const siteAddress = "https://localhost:5001/";
+
 async function sendJsonMessage (uri, method, message = "") {
     let init;
     if (message === "") {
@@ -31,13 +33,13 @@ async function sendCommonJsonMessage(uri, method, message) {
 }
 
 async function logout() {
-    await sendJsonMessage("https://192.168.1.130/Logout", 'GET');
-    window.location = "https://192.168.1.130/Account/Login";
+    await sendJsonMessage(siteAddress + "Logout", 'GET');
+    window.location = siteAddress + "Account/Login";
 }
 
 function getUserPhoto(userPhotoId) {
     let userPhoto = document.getElementById(userPhotoId);
-    sendJsonMessage("https://192.168.1.130/GetUserPhotoUrl", 'GET').then(response => {
+    sendJsonMessage(siteAddress + "GetUserPhotoUrl", 'GET').then(response => {
         response.text().then(text => {
             userPhoto.src = text;
         });
@@ -46,7 +48,7 @@ function getUserPhoto(userPhotoId) {
 
 async function isNameUsed(name) {
     if (name.length > 3) {
-        let response = await sendJsonMessage("https://192.168.1.130/IsUserNameUsed", 'POST', name)
+        let response = await sendJsonMessage(siteAddress + "IsUserNameUsed", 'POST', name)
         let json = await response.json();
         if (json === true) {
             dropTextLogin.classList.add("highlight");

@@ -24,7 +24,7 @@ myFilesButton.addEventListener("click", () => {
 
 let profileButton = document.getElementById("profile");
 profileButton.addEventListener("click", () => {
-    window.location = "Https://192.168.1.130/Account/Profile"
+    window.location = siteAddress + "Account/Profile"
 });
 
 let logOutButton = document.getElementById("logOut-button");
@@ -92,14 +92,14 @@ let arrow = document.getElementById("arrow");
 ASC.addEventListener("click", () => {
     sortType.TypeOfSort = "ASC"
     pageUpdater.changeSortType(sortType);
-    arrow.src = "https://192.168.1.130/images/free-icon-down-arrow-134210.png";
+    arrow.src = siteAddress + "images/free-icon-down-arrow-134210.png";
     updatePage();
 });
 
 DESC.addEventListener("click", () => {
     sortType.TypeOfSort = "DESC";
     pageUpdater.changeSortType(sortType);
-    arrow.src = "https://192.168.1.130/images/free-icon-up-arrow-134211.png";
+    arrow.src = siteAddress + "images/free-icon-up-arrow-134211.png";
     updatePage();
 });
 

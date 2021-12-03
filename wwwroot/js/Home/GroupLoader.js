@@ -1,6 +1,6 @@
 class GroupLoader {
     async findMyGroups() {
-        let response = await sendJsonMessage("https://192.168.1.130/FindMyGroups", 'GET');
+        let response = await sendJsonMessage(siteAddress + "FindMyGroups", 'GET');
         return await response.json();
     }
 
@@ -9,7 +9,7 @@ class GroupLoader {
         group.className = "file";
         group.id = `group-${json.name}`;
         group.innerHTML =
-            `<img  alt=\"\" src=\"https://192.168.1.130/images/free-icon-folder-149334.png\" class=\"file-img\"/>\n` +
+            `<img  alt=\"\" src=\"${siteAddress}images/free-icon-folder-149334.png\" class=\"file-img\"/>\n` +
             `<div class=\"file-name\">${json.name}</div>\n`;
         group.groupPassword = json.groupPassword;
         return group;

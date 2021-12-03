@@ -10,26 +10,26 @@ class FileLoader {
     };
 
     async getFileInfo() {
-        let response = await sendJsonMessage("https://192.168.1.130/GetFileInfo", 'POST', this.sortType);
+        let response = await sendJsonMessage(siteAddress + "GetFileInfo", 'POST', this.sortType);
         return await response.json();
     }
 
     async getCommonFileInfo() {
         let response = 
-            await sendCommonJsonMessage("https://192.168.1.130/GetCommonFileInfo", 'POST', this.sortType);
+            await sendCommonJsonMessage(siteAddress + "GetCommonFileInfo", 'POST', this.sortType);
         return await response.json();
     }
 
     async loadFile(file) {
         let formData = new FormData();
         formData.append('files', file);
-        await FileLoader._sendFile(formData, "https://192.168.1.130/LoadFiles");
+        await FileLoader._sendFile(formData, siteAddress + "LoadFiles");
     }
 
     async loadCommonFile(file) {
         let formData = new FormData();
         formData.append('files', file);
-        await FileLoader._sendCommonFile(formData, "https://192.168.1.130/LoadCommonFiles");
+        await FileLoader._sendCommonFile(formData, siteAddress + "LoadCommonFiles");
     }
 
     static async _sendFile(formData, url) {
@@ -73,7 +73,7 @@ class FileLoader {
             `<p id=\"load-this-${json.name}\">Скачать</p>\n` +
             `<p id=\"delete-this-${json.name}\">Удалить</p>\n` +
             `</div>` +
-            `<img  alt=\"\" src=\"https://192.168.1.130/images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
+            `<img  alt=\"\" src=\"${siteAddress}images/free-icon-file-149345.png\" class=\"file-img\"/>\n` +
             `<div class=\"file-name\">${FileLoader._createCurrentFileName(json.name, json.typeOfFile)}</div>\n`;
         return file;
     }
@@ -105,7 +105,7 @@ class FileLoader {
     }
 
     static async _loadFileByClick(name) {
-        let response = await sendJsonMessage("https://192.168.1.130/GetVirtualFile", 'POST', name)
+        let response = await sendJsonMessage(siteAddress + "GetVirtualFile", 'POST', name)
         let blob = await response.blob();
         let url = await URL.createObjectURL(blob);
 
@@ -118,7 +118,7 @@ class FileLoader {
 
     static async _deleteOneFile(name) {
         if (confirm("Вы уверены, что хотите удалить файл?")) {
-            await sendJsonMessage("https://192.168.1.130/DeleteOneFile", 'DELETE', name);
+            await sendJsonMessage(siteAddress + "DeleteOneFile", 'DELETE', name);
             updatePage();
         }
     }
@@ -131,7 +131,7 @@ class FileLoader {
     }
 
     static async _loadCommonFileByClick(name) {
-        let response = await sendCommonJsonMessage("https://192.168.1.130/GetCommonVirtualFile", 'POST', name)
+        let response = await sendCommonJsonMessage(siteAddress + "GetCommonVirtualFile", 'POST', name)
         let blob = await response.blob();
         let url = await URL.createObjectURL(blob);
 
@@ -144,7 +144,7 @@ class FileLoader {
 
     static async _deleteOneCommonFile(name) {
         if (confirm("Вы уверены, что хотите удалить файл?")) {
-            await sendCommonJsonMessage("https://192.168.1.130/DeleteOneCommonFile", 'DELETE', name);
+            await sendCommonJsonMessage(siteAddress + "DeleteOneCommonFile", 'DELETE', name);
             updatePage();
         }
     }

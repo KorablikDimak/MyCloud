@@ -514,4 +514,13 @@ body {
     .center {
         width: auto;
     }
+    .sort-type-icon2 {
+        display: none;
+    }
+    .search-img {
+        display: none;
+    }
+    .search-container {
+        width: 100%;
+    }
 }

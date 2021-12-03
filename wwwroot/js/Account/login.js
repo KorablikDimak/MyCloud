@@ -1,5 +1,10 @@
 let dropTextLogin = document.getElementById("drop-text-login");
 
+let registrationButton = document.getElementById("registration-button");
+registrationButton.addEventListener("click", () => {
+    window.location = siteAddress + "Account/Registration";
+});
+
 let loginButton = document.getElementById("login-button");
 loginButton.addEventListener("click", () => {
     let message = {
@@ -7,11 +12,11 @@ loginButton.addEventListener("click", () => {
         Password: document.getElementById("password-input").value
     };
     
-    sendJsonMessage("https://192.168.1.130/Login", 'POST', message)
+    sendJsonMessage(siteAddress + "Login", 'POST', message)
         .then((response) => {
             console.log(response.status);
             if (response.status === 200) {
-                window.location = "https://192.168.1.130/Home/MyFiles";
+                window.location = siteAddress + "Home/MyFiles";
             }
             else {
                 dropTextLogin.classList.add("highlight");

@@ -246,6 +246,7 @@ body {
 
 @media (max-width: 767px) {
     .container {
+        margin-bottom: 8%;
         padding: 10px 0;
         display: block;
         max-width: none;

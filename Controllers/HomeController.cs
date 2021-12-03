@@ -18,6 +18,7 @@ namespace MyCloud.Controllers
     public class HomeController : Controller
     {
         private const long MaxMemorySize = 10737418240;
+        private const long RequestSizeLimit = 1073741824;
         private readonly IDatabaseRequest _databaseRequest;
 
         public HomeController(HomeDataRequestBuilder homeDataRequestBuilder)
@@ -31,7 +32,7 @@ namespace MyCloud.Controllers
             return View();
         }
         
-        [RequestSizeLimit(1073741824)]
+        [RequestSizeLimit(RequestSizeLimit)]
         [HttpPost("LoadFiles")]
         public async Task<IActionResult> LoadFiles(ICollection<IFormFile> files)
         {
@@ -124,7 +125,7 @@ namespace MyCloud.Controllers
             }).ToList();
         }
         
-        [RequestSizeLimit(1073741824)]
+        [RequestSizeLimit(RequestSizeLimit)]
         [HttpPost("GetVirtualFile")]
         public IActionResult GetVirtualFile([FromBody] string fileName)
         {
@@ -221,7 +222,7 @@ namespace MyCloud.Controllers
             return true;
         }
         
-        [RequestSizeLimit(1073741824)]
+        [RequestSizeLimit(RequestSizeLimit)]
         [HttpPost("GetCommonVirtualFile")]
         public async Task<IActionResult> GetCommonVirtualFile([FromBody] string fileName, 
             [FromHeader(Name = "GroupName")] string groupName, [FromHeader(Name = "GroupPassword")] string groupPassword)

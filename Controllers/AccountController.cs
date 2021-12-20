@@ -323,15 +323,15 @@ namespace MyCloud.Controllers
             return true;
         }
         
-        [HttpGet("GetUserPhotoUrl")]
-        public async Task<string> GetUserPhotoUrl()
+        [HttpGet("GetUserPhotoName")]
+        public async Task<string> GetUserPhotoName()
         {
             string iconName = await _databaseRequest.DatabaseUsersRequest.GetIcon(User.Identity.Name);
             if (System.IO.File.Exists($"wwwroot\\UserIcons\\{iconName}"))
             {
-                return $"https://192.168.1.130/UserIcons/{iconName}";
+                return $"UserIcons/{iconName}";
             }
-            return "https://192.168.1.130/images/free-icon-user-149452.png";
+            return "images/free-icon-user-149452.png";
         }
     }
 }

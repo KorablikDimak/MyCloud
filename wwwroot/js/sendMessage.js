@@ -39,9 +39,9 @@ async function logout() {
 
 function getUserPhoto(userPhotoId) {
     let userPhoto = document.getElementById(userPhotoId);
-    sendJsonMessage(siteAddress + "GetUserPhotoUrl", 'GET').then(response => {
+    sendJsonMessage(siteAddress + "GetUserPhotoName", 'GET').then(response => {
         response.text().then(text => {
-            userPhoto.src = text;
+            userPhoto.src = siteAddress + text;
         });
     });
 }

@@ -30,10 +30,9 @@ namespace MyCloud
             });
             
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
             
-            services.AddDataRequest<HomeDataRequestBuilder>();
-            services.AddDataRequest<AccountDataRequestBuilder>();
+            services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
+            services.AddDataRequest<DataRequestBuilder>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

@@ -18,11 +18,11 @@ namespace MyCloud.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly IDatabaseRequest _databaseRequest;
+        private readonly DatabaseRequest _databaseRequest;
 
-        public AccountController(AccountDataRequestBuilder accountDataRequestBuilder)
+        public AccountController(DatabaseRequest databaseRequest)
         {
-            _databaseRequest = accountDataRequestBuilder.DatabaseRequest;
+            _databaseRequest = databaseRequest;
         }
         
         [AllowAnonymous]

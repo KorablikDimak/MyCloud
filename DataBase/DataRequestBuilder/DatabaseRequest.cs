@@ -2,7 +2,7 @@ using MyCloud.DataBase.Interfaces;
 
 namespace MyCloud.DataBase.DataRequestBuilder
 {
-    public class DatabaseRequest : IDatabaseRequest
+    public class DatabaseRequest
     {
         public IDatabaseFilesRequest DatabaseFilesRequest { get; set; }
         public IDatabaseGroupsRequest DatabaseGroupsRequest { get; set; }

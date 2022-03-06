@@ -10,9 +10,6 @@ namespace MyCloud.DataBase
 {
     public class DatabaseFilesRequest : IDatabaseFilesRequest
     {
-        public Group Group { private get; set; }
-        public User User { private get; set; }
-        
         private readonly DataContext _databaseContext;
 
         public DatabaseFilesRequest(DataContext context)
@@ -20,11 +17,11 @@ namespace MyCloud.DataBase
             _databaseContext = context;
         }
 
-        public async Task<bool> AddFileAsync(MyFileInfo fileInfo)
+        public async Task<bool> AddFileAsync<T>(MyFileInfo fileInfo, T criterion)
         {
             try
             {
-                fileInfo.User = User;
+                fileInfo.User = criterion as User;
                 await _databaseContext.Files.AddAsync(fileInfo);
                 await _databaseContext.SaveChangesAsync();
             }
@@ -37,19 +34,19 @@ namespace MyCloud.DataBase
             return true;
         }
         
-        public IQueryable<MyFileInfo> FindFiles()
+        public IQueryable<MyFileInfo> FindFiles<T>(T criterion)
         {
-            IQueryable<MyFileInfo> files = _databaseContext.Files.Where(file => file.User == User);
+            IQueryable<MyFileInfo> files = _databaseContext.Files.Where(file => file.User == criterion as User);
             return files;
         }
         
-        public async Task<bool> DeleteFileAsync(string fileName)
+        public async Task<bool> DeleteFileAsync<T>(string fileName, T criterion)
         {
             try
             {
                 MyFileInfo fileInfo = await _databaseContext.Files.FirstOrDefaultAsync(file => 
                     file.Name == fileName &&
-                    file.User == User);
+                    file.User == criterion as User);
                 if (fileInfo == null) return false;
                 _databaseContext.Files.Remove(fileInfo);
                 await _databaseContext.SaveChangesAsync();
@@ -63,11 +60,11 @@ namespace MyCloud.DataBase
             return true;
         }
         
-        public async Task<bool> DeleteAllFilesAsync()
+        public async Task<bool> DeleteAllFilesAsync<T>(T criterion)
         {
             try
             {
-                _databaseContext.Files.RemoveRange(FindFiles());
+                _databaseContext.Files.RemoveRange(FindFiles(criterion));
                 await _databaseContext.SaveChangesAsync();
             }
             catch (Exception e)

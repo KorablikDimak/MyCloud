@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using InfoLog;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -19,11 +20,13 @@ namespace MyCloud.Controllers
     {
         private const long MaxMemorySize = 10737418240;
         private const long RequestSizeLimit = 1073741824;
-        private readonly DatabaseRequest _databaseRequest;
+        private DatabaseRequest DatabaseRequest { get; }
+        private ILogger Logger { get; }
 
-        public HomeController(DatabaseRequest databaseRequest)
+        public HomeController(DatabaseRequest databaseRequest, ILogger logger)
         {
-            _databaseRequest = databaseRequest;
+            DatabaseRequest = databaseRequest;
+            Logger = logger;
         }
         
         [HttpGet]
@@ -44,14 +47,14 @@ namespace MyCloud.Controllers
             if (!(GetDirectorySize($"UserFiles\\{User.Identity.Name}") + size <= MaxMemorySize))
                 return new ConflictResult();
 
-            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
+            User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null)
             {
                 return new ConflictResult();
             }
 
             bool isSaved =
-                await SaveFilesAsync(_databaseRequest.DatabaseFilesRequest, files, $"UserFiles\\{User.Identity.Name}", user);
+                await SaveFilesAsync(DatabaseRequest.DatabaseFilesRequest, files, $"UserFiles\\{User.Identity.Name}", user);
             if (isSaved) return Ok();
             return new ConflictResult();
         }
@@ -95,8 +98,8 @@ namespace MyCloud.Controllers
         [HttpPost("GetFileInfo")]
         public async Task<List<MyFileInfo>> GetFileInfo([FromBody] SortType sortType)
         {
-            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
-            return user == null ? new List<MyFileInfo>() : GetFileInfos(_databaseRequest.DatabaseFilesRequest, sortType, user);
+            User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
+            return user == null ? new List<MyFileInfo>() : GetFileInfos(DatabaseRequest.DatabaseFilesRequest, sortType, user);
         }
 
         private List<MyFileInfo> GetFileInfos<T>(IDatabaseFilesRequest databaseFilesRequest, SortType sortType, T criterion)
@@ -141,13 +144,13 @@ namespace MyCloud.Controllers
         {
             string filepath = Path.Combine($"UserFiles\\{User.Identity.Name}", fileName);
             
-            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
+            User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null)
             {
                 return new ConflictResult();
             }
             
-            bool isDeleted = await DeleteFileAsync(_databaseRequest.DatabaseFilesRequest, fileName, filepath, user);
+            bool isDeleted = await DeleteFileAsync(DatabaseRequest.DatabaseFilesRequest, fileName, filepath, user);
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
@@ -164,13 +167,13 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteAllFiles")]
         public async Task<IActionResult> DeleteAllFiles()
         {
-            User user = await _databaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
+            User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null)
             {
                 return new ConflictResult();
             }
             
-            bool isDeleted = await DeleteAllAsync(_databaseRequest.DatabaseFilesRequest, 
+            bool isDeleted = await DeleteAllAsync(DatabaseRequest.DatabaseFilesRequest, 
                 $"UserFiles\\{User.Identity.Name}", user);
             if (isDeleted) return Ok();
             return new ConflictResult();
@@ -219,9 +222,9 @@ namespace MyCloud.Controllers
                 GroupPassword = groupPassword
             };
 
-            Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
             return group == null ? new List<MyFileInfo>() : 
-                GetFileInfos(_databaseRequest.DatabaseCommonFilesRequest, sortType, group);
+                GetFileInfos(DatabaseRequest.DatabaseCommonFilesRequest, sortType, group);
         }
 
         [RequestSizeLimit(RequestSizeLimit)]
@@ -235,7 +238,7 @@ namespace MyCloud.Controllers
                 GroupPassword = groupPassword
             };
             
-            Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
             return group == null ? null : 
                 GetFile(fileName, $"CommonFiles\\{group.Name}");
         }
@@ -256,13 +259,13 @@ namespace MyCloud.Controllers
             }
             if (!(await CountCommonMemorySize() + size <= MaxMemorySize)) return new ConflictResult();
             
-            Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
             if (group == null)
             {
                 return new ConflictResult();
             }
             
-            bool isSaved = await SaveFilesAsync(_databaseRequest.DatabaseCommonFilesRequest, files,
+            bool isSaved = await SaveFilesAsync(DatabaseRequest.DatabaseCommonFilesRequest, files,
                 $"CommonFiles\\{groupLogin.Name}", group);
             if (isSaved) return Ok();
             return new ConflictResult();
@@ -278,14 +281,14 @@ namespace MyCloud.Controllers
                 GroupPassword = groupPassword
             };
             
-            Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
             if (group == null)
             {
                 return new ConflictResult();
             }
             
             string filePath = Path.Combine($"CommonFiles\\{groupLogin.Name}", fileName);
-            bool isDeleted = await DeleteFileAsync(_databaseRequest.DatabaseCommonFilesRequest, fileName, filePath, group);
+            bool isDeleted = await DeleteFileAsync(DatabaseRequest.DatabaseCommonFilesRequest, fileName, filePath, group);
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
@@ -300,14 +303,14 @@ namespace MyCloud.Controllers
                 GroupPassword = groupPassword
             };
             
-            Group group = await _databaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
             if (group == null)
             {
                 return new ConflictResult();
             }
             
             string filePath = $"CommonFiles\\{groupLogin.Name}";
-            bool isDeleted = await DeleteAllAsync(_databaseRequest.DatabaseCommonFilesRequest, filePath, group);
+            bool isDeleted = await DeleteAllAsync(DatabaseRequest.DatabaseCommonFilesRequest, filePath, group);
             if (isDeleted) return Ok();
             return new ConflictResult();
         }
@@ -320,7 +323,7 @@ namespace MyCloud.Controllers
 
         private async Task<long> CountCommonMemorySize()
         {
-            List<Group> groups = await _databaseRequest.DatabaseGroupsRequest.FindGroupsInUser(User.Identity.Name);
+            List<Group> groups = await DatabaseRequest.DatabaseGroupsRequest.FindGroupsInUser(User.Identity.Name);
             long commonMemorySize = 0;
             foreach (var group in groups)
             {

@@ -1,4 +1,5 @@
 using System;
+using InfoLog;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +23,8 @@ namespace MyCloud
         
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogger<Logger>("C:\\Users\\korab\\RiderProjects\\MyCloud\\MyCloud\\LogConfig.xml");
+            
             services.AddHsts(options =>
             {
                 options.Preload = true;

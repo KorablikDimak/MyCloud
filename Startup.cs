@@ -23,7 +23,7 @@ namespace MyCloud
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogger<Logger>("C:\\Users\\korab\\RiderProjects\\MyCloud\\MyCloud\\LogConfig.xml");
+            services.AddLogger<Logger>("LogConfig.xml");
             
             services.AddHsts(options =>
             {

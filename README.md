@@ -8,6 +8,7 @@ Remote file sharing service that allows you to quickly download, save and group 
 There is a fairly large api for possible integration with desktop applications and applications on android / ios.
 ### Back-end
 Executed entirely in **C#** using frameworks `ASP.NET Core MVC` and `Entity Framework`.
+Support logging by `InfoLog`.
 There is support for **authorization** based on cookies, **validation** of input data, saving data to a database `MS Sql`.
 The application makes extensive use of **asynchrony** for optimal use of machine resources.
 Most of the classes are implemented through interfaces, the **builder pattern** was also used, so that individual application modules can be replaced without serious problems with other modules with a different implementation.

@@ -1,14 +1,16 @@
 using System;
 using System.Threading.Tasks;
+using InfoLog;
 using Microsoft.EntityFrameworkCore;
 using MyCloud.DataBase.Interfaces;
 using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabasePersonalityRequest : IDatabasePersonalityRequest
+    public class DatabasePersonalityRequest : IDatabasePersonalityRequest, IHaveLogger
     {
         private readonly DataContext _databaseContext;
+        public ILogger Logger { get; set; }
 
         public DatabasePersonalityRequest(DataContext context)
         {
@@ -34,7 +36,7 @@ namespace MyCloud.DataBase
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                await Logger?.Error(e.ToString())!;
                 return false;
             }
 

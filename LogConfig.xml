@@ -3,7 +3,7 @@
     <targets>
         <target logsender="File" minlevel="Warning" filepath="{basedir}\logs\{shortdate}.log"
                 layout="{shortdate} | {longtime}:{millisecond} | {level} | {class} {method}() | line: {line} | {message}"/>
-        <target logsender="database" minlevel="Error" connectionstring="Data Source=LAPTOP-KPPKGVU7\LOVE;Initial Catalog=MyCloud;Persist Security Info=True;User ID=root;Password=Faggot_2002"
+        <target logsender="Database" minlevel="Error" connectionstring="Data Source=LAPTOP-KPPKGVU7\LOVE;Initial Catalog=MyCloud;Persist Security Info=True;User ID=root;Password=Faggot_2002"
                 layout="{shortdate} | {longtime}:{millisecond} | {level} | {class} {method}() | line: {line} | {message}"
                 tablename="logs"/>
         </targets>

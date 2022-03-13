@@ -25,6 +25,7 @@ namespace MyCloud.Controllers
 
         public HomeController(DatabaseRequest databaseRequest, ILogger logger)
         {
+            databaseRequest.ImplementLogger(logger);
             DatabaseRequest = databaseRequest;
             Logger = logger;
         }

@@ -2,15 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using InfoLog;
 using Microsoft.EntityFrameworkCore;
 using MyCloud.DataBase.Interfaces;
 using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabaseGroupsRequest : IDatabaseGroupsRequest
+    public class DatabaseGroupsRequest : IDatabaseGroupsRequest, IHaveLogger
     {
         private readonly DataContext _databaseContext;
+        public ILogger Logger { get; set; }
 
         public DatabaseGroupsRequest(DataContext context)
         {
@@ -48,7 +50,7 @@ namespace MyCloud.DataBase
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                await Logger?.Error(e.ToString())!;
                 return false;
             }
 
@@ -65,7 +67,7 @@ namespace MyCloud.DataBase
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                await Logger?.Error(e.ToString())!;
                 return false;
             }
 
@@ -87,7 +89,7 @@ namespace MyCloud.DataBase
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                await Logger?.Error(e.ToString())!;
                 return false;
             }
 
@@ -106,7 +108,7 @@ namespace MyCloud.DataBase
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                await Logger?.Error(e.ToString())!;
                 return false;
             }
 
@@ -133,7 +135,7 @@ namespace MyCloud.DataBase
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                await Logger?.Error(e.ToString())!;
                 return false;
             }
 

@@ -37,4 +37,11 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0-preview.5.21301.9" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="LogConfig.xml" />
+      <Content Include="LogConfig.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

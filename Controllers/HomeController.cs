@@ -135,6 +135,10 @@ namespace MyCloud.Controllers
 
         private IActionResult GetFile(string fileName, string path)
         {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
             string filepath = Path.Combine(path, fileName);
             Stream fileStream = new FileStream(filepath, FileMode.Open);
             return File(fileStream, "application/octet-stream");
@@ -143,14 +147,13 @@ namespace MyCloud.Controllers
         [HttpDelete("DeleteOneFile")]
         public async Task<IActionResult> DeleteOneFile([FromBody] string fileName)
         {
-            string filepath = Path.Combine($"UserFiles\\{User.Identity.Name}", fileName);
-            
             User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null)
             {
                 return new ConflictResult();
             }
             
+            string filepath = Path.Combine($"UserFiles\\{User.Identity.Name}", fileName);
             bool isDeleted = await DeleteFileAsync(DatabaseRequest.DatabaseFilesRequest, fileName, filepath, user);
             if (isDeleted) return Ok();
             return new ConflictResult();
@@ -202,6 +205,10 @@ namespace MyCloud.Controllers
 
         private long GetDirectorySize(string path)
         {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.GetFiles().Sum(file => file.Length);
         }
@@ -238,8 +245,9 @@ namespace MyCloud.Controllers
                 Name = groupName,
                 GroupPassword = groupPassword
             };
-            
+
             Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+
             return group == null ? null : 
                 GetFile(fileName, $"CommonFiles\\{group.Name}");
         }
@@ -325,13 +333,8 @@ namespace MyCloud.Controllers
         private async Task<long> CountCommonMemorySize()
         {
             List<Group> groups = await DatabaseRequest.DatabaseGroupsRequest.FindGroupsInUser(User.Identity.Name);
-            long commonMemorySize = 0;
-            foreach (var group in groups)
-            {
-                commonMemorySize += GetDirectorySize($"CommonFiles\\{group.Name}");
-            }
 
-            return commonMemorySize;
+            return groups.Sum(group => GetDirectorySize($"CommonFiles\\{group.Name}"));
         }
     }
 }

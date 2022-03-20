@@ -61,7 +61,7 @@ body {
     transition: all 0.3s ease-in-out;
 }
 
-#group-window.highlight {
+#group-window.highlight, #group-window-change.highlight {
     opacity: 1;
     z-index: 1;
 }
@@ -72,7 +72,7 @@ body {
     margin: 25% 25%;
 }
 
-#group-window.highlight .group-container {
+#group-window.highlight .group-container, #group-window-change.highlight .group-container{
     background-color: #f1f1f1;
 }
 
@@ -216,7 +216,7 @@ body {
     cursor: pointer;
 }
 
-#change-group, #enter-group, #create-group {
+#change-group {
     background: linear-gradient(to top right, #dfe357, #eed073 20%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0)) top right/500% 500%;
     border: 2px solid #d6a54f;
 }

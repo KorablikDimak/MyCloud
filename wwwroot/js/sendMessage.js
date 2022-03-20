@@ -45,15 +45,3 @@ function getUserPhoto(userPhotoId) {
         });
     });
 }
-
-async function isNameUsed(name) {
-    if (name.length > 3) {
-        let response = await sendJsonMessage(siteAddress + "IsUserNameUsed", 'POST', name)
-        let json = await response.json();
-        if (json === true) {
-            dropTextLogin.classList.add("highlight");
-            dropTextLogin.innerText = "Данное имя занято";
-        }
-        console.log(json);
-    }
-}

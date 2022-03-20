@@ -11,7 +11,7 @@ namespace MyCloud.Models.User
         [StringLength(20, MinimumLength = 3)]
         public string UserName { get; set; }
         [Required]
-        [StringLength(20, MinimumLength = 8)]
+        [StringLength(32)]
         public string Password { get; set; }
         public ICollection<MyFileInfo> Files { get; set; }
         public PersonalityData PersonalityData { get; set; }

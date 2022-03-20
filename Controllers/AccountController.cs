@@ -42,7 +42,8 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
 
-            var user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(loginModel.UserName, loginModel.Password);
+            var user = await DatabaseRequest.DatabaseUsersRequest
+                .FindUserAsync(loginModel.UserName, loginModel.Password.HashPassword());
             if (user == null) return new ForbidResult();
             
             await AuthenticateAsync(loginModel.UserName);
@@ -76,13 +77,15 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
             
-            bool isAdded = await DatabaseRequest.DatabaseUsersRequest.AddUserAsync(registrationModel.UserName, registrationModel.Password);
+            bool isAdded = await DatabaseRequest.DatabaseUsersRequest
+                .AddUserAsync(registrationModel.UserName, registrationModel.Password.HashPassword());
             if (!isAdded) return new ConflictResult();
             
             bool isCreated = CreateDirectory($"UserFiles\\{registrationModel.UserName}");
             if (isCreated) return Ok();
             
-            await DatabaseRequest.DatabaseUsersRequest.DeleteUserAsync(registrationModel.UserName, registrationModel.Password);
+            await DatabaseRequest.DatabaseUsersRequest
+                .DeleteUserAsync(registrationModel.UserName, registrationModel.Password.HashPassword());
             return new ConflictResult();
         }
 
@@ -163,8 +166,8 @@ namespace MyCloud.Controllers
             if (!ModelState.IsValid) return new ForbidResult();
             bool isChanged = await DatabaseRequest.DatabaseUsersRequest.ChangePasswordAsync(
                 User.Identity.Name, 
-                passwordModel.OldPassword, 
-                passwordModel.NewPassword);
+                passwordModel.OldPassword.HashPassword(), 
+                passwordModel.NewPassword.HashPassword());
             if (!isChanged) return new ConflictResult();
             return Ok();
         }
@@ -174,7 +177,7 @@ namespace MyCloud.Controllers
         {
             if (!ModelState.IsValid) return new ForbidResult();
             bool isUserDeleted = await DatabaseRequest.DatabaseUsersRequest
-                .DeleteUserAsync(User.Identity.Name, password);
+                .DeleteUserAsync(User.Identity.Name, password.HashPassword());
             if (!isUserDeleted) return new ConflictResult();
             bool isDirectoryDeleted = DeleteDirectory($"UserFiles\\{User.Identity.Name}");
             if (!isDirectoryDeleted) return new ConflictResult();
@@ -204,6 +207,14 @@ namespace MyCloud.Controllers
             return View();
         }
         
+        [AllowAnonymous]
+        [HttpPost("IsGroupNameUsed")]
+        public async Task<bool> IsGroupNameUsed([FromBody] string groupName)
+        {
+            Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupName);
+            return group != null;
+        }
+        
         [HttpGet("FindMyGroups")]
         public async Task<List<GroupLogin>> FindMyGroups()
         {
@@ -213,11 +224,11 @@ namespace MyCloud.Controllers
         }
         
         [HttpPost("FindUsersInGroup")]
-        public async Task<List<Personality>> FindUsersInGroup([FromBody] GroupLogin groupLogin)
+        public async Task<List<Personality>> FindUsersInGroup([FromBody] string groupName)
         {
             if (!ModelState.IsValid) return new List<Personality>();
             List<Personality> personalities = new List<Personality>();
-            List<User> users = await DatabaseRequest.DatabaseUsersRequest.FindUsersInGroup(groupLogin);
+            List<User> users = await DatabaseRequest.DatabaseGroupsRequest.FindUsersInGroup(groupName);
             foreach (var user in users)
             {
                 Personality personality = await DatabaseRequest.DatabasePersonalityRequest
@@ -234,6 +245,7 @@ namespace MyCloud.Controllers
             if (!ModelState.IsValid) return new ForbidResult();
             User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
+            groupLogin.GroupPassword = groupLogin.GroupPassword.HashPassword();
             bool isEntered = await DatabaseRequest.DatabaseGroupsRequest.AddUserInGroupAsync(groupLogin, user);
             if (isEntered) return Ok();
             return new ConflictResult();
@@ -245,21 +257,35 @@ namespace MyCloud.Controllers
             if (!ModelState.IsValid) return new ForbidResult();
             User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
+
+            groupLogin.GroupPassword = groupLogin.GroupPassword.HashPassword();
             bool isLeave = await DatabaseRequest.DatabaseGroupsRequest.RemoveUserFromGroupAsync(groupLogin, user);
-            if (isLeave) return Ok();
-            return new ConflictResult();
+            if (!isLeave) return new ConflictResult();
+
+            Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
+            if (group != null) return Ok();
+            
+            bool isDeleted = DeleteDirectory($"CommonFiles\\{groupLogin.Name}");
+            if (!isDeleted) return new ConflictResult();
+
+            return Ok();
         }
         
         [HttpPost("CreateGroup")]
         public async Task<IActionResult> CreateGroup([FromBody] GroupLogin groupLogin)
         {
             if (!ModelState.IsValid) return new ForbidResult();
-            bool isCreated = CreateDirectory($"CommonFiles\\{groupLogin.Name}");
-            if (!isCreated) return new ConflictResult();
             User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
             if (user == null) return new ConflictResult();
+            
+            bool isCreated = CreateDirectory($"CommonFiles\\{groupLogin.Name}");
+            if (!isCreated) return new ConflictResult();
+            
+            groupLogin.GroupPassword = groupLogin.GroupPassword.HashPassword();
             isCreated = await DatabaseRequest.DatabaseGroupsRequest.CreateGroupAsync(groupLogin, user);
+            
             if (isCreated) return Ok();
+            DeleteDirectory($"CommonFiles\\{groupLogin.Name}");
             return new ConflictResult();
         }
         
@@ -267,24 +293,37 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> DeleteGroup([FromBody] GroupLogin groupLogin)
         {
             if (!ModelState.IsValid) return new ForbidResult();
-            bool isDeleted = DeleteDirectory($"CommonFiles\\{groupLogin.Name}");
+            groupLogin.GroupPassword = groupLogin.GroupPassword.HashPassword();
+            bool isDeleted = await DatabaseRequest.DatabaseGroupsRequest.DeleteGroupAsync(groupLogin);
             if (!isDeleted) return new ConflictResult();
-            isDeleted = await DatabaseRequest.DatabaseGroupsRequest.DeleteGroupAsync(groupLogin);
+            
+            isDeleted = DeleteDirectory($"CommonFiles\\{groupLogin.Name}");
             if (isDeleted) return Ok();
+            
+            User user = await DatabaseRequest.DatabaseUsersRequest.FindUserAsync(User.Identity.Name);
+            await DatabaseRequest.DatabaseGroupsRequest.CreateGroupAsync(groupLogin, user);
             return new ConflictResult();
         }
         
-        [HttpPatch("ChangeGroupName")]
+        [HttpPatch("ChangeGroupLogin")]
         public async Task<IActionResult> ChangeGroupLogin([FromBody] GroupLogin[] groupLogin)
         {
             if (!ModelState.IsValid) return new ForbidResult();
-            bool isChanged = ChangeDirectoryName("CommonFiles", 
+
+            groupLogin[0].GroupPassword = groupLogin[0].GroupPassword.HashPassword();
+            groupLogin[1].GroupPassword = groupLogin[1].GroupPassword.HashPassword();
+
+            bool isChanged = await DatabaseRequest.DatabaseGroupsRequest
+                .ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
+            if (!isChanged) return new ConflictResult();
+            
+            isChanged = ChangeDirectoryName("CommonFiles", 
                 groupLogin[0].Name, 
                 groupLogin[1].Name);
-            if (!isChanged) return new ConflictResult();
-            isChanged = await DatabaseRequest.DatabaseGroupsRequest
-                .ChangeGroupLoginAsync(groupLogin[0], groupLogin[1]);
             if (isChanged) return Ok();
+            
+            await DatabaseRequest.DatabaseGroupsRequest
+                .ChangeGroupLoginAsync(groupLogin[1], groupLogin[0]);
             return new ConflictResult();
         }
         

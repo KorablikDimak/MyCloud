@@ -11,12 +11,12 @@ namespace MyCloud.DataBase
 {
     public class DatabaseFilesRequest : IDatabaseFilesRequest, IHaveLogger
     {
-        private readonly DataContext _databaseContext;
+        private DataContext DatabaseContext { get; }
         public ILogger Logger { get; set; }
 
         public DatabaseFilesRequest(DataContext context)
         {
-            _databaseContext = context;
+            DatabaseContext = context;
         }
 
         public async Task<bool> AddFileAsync<T>(MyFileInfo fileInfo, T criterion)
@@ -24,8 +24,8 @@ namespace MyCloud.DataBase
             try
             {
                 fileInfo.User = criterion as User;
-                await _databaseContext.Files.AddAsync(fileInfo);
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.Files.AddAsync(fileInfo);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -38,7 +38,7 @@ namespace MyCloud.DataBase
         
         public IQueryable<MyFileInfo> FindFiles<T>(T criterion)
         {
-            IQueryable<MyFileInfo> files = _databaseContext.Files.Where(file => file.User == criterion as User);
+            IQueryable<MyFileInfo> files = DatabaseContext.Files.Where(file => file.User == criterion as User);
             return files;
         }
         
@@ -46,12 +46,12 @@ namespace MyCloud.DataBase
         {
             try
             {
-                MyFileInfo fileInfo = await _databaseContext.Files.FirstOrDefaultAsync(file => 
+                MyFileInfo fileInfo = await DatabaseContext.Files.FirstOrDefaultAsync(file => 
                     file.Name == fileName &&
                     file.User == criterion as User);
                 if (fileInfo == null) return false;
-                _databaseContext.Files.Remove(fileInfo);
-                await _databaseContext.SaveChangesAsync();
+                DatabaseContext.Files.Remove(fileInfo);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -66,8 +66,8 @@ namespace MyCloud.DataBase
         {
             try
             {
-                _databaseContext.Files.RemoveRange(FindFiles(criterion));
-                await _databaseContext.SaveChangesAsync();
+                DatabaseContext.Files.RemoveRange(FindFiles(criterion));
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {

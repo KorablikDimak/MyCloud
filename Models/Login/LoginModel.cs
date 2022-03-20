@@ -8,7 +8,7 @@ namespace MyCloud.Models.Login
         [StringLength(20, MinimumLength = 3)]
         public string UserName { get; set; }
         [Required]
-        [StringLength(20, MinimumLength = 8)]
+        [StringLength(32, MinimumLength = 8)]
         public string Password { get; set; }
     }
 }

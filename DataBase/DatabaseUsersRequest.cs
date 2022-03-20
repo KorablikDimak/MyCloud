@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using InfoLog;
 using Microsoft.EntityFrameworkCore;
@@ -11,33 +9,24 @@ namespace MyCloud.DataBase
 {
     public class DatabaseUsersRequest : IDatabaseUsersRequest, IHaveLogger
     {
-        private readonly DataContext _databaseContext;
+        private DataContext DatabaseContext { get; }
         public ILogger Logger { get; set; }
 
         public DatabaseUsersRequest(DataContext context)
         {
-            _databaseContext = context;
+            DatabaseContext = context;
         }
 
-        public async Task<List<User>> FindUsersInGroup(GroupLogin groupLogin)
-        {
-            Group currentGroup = await _databaseContext.Groups
-                .Include(group => group.Users)
-                .FirstOrDefaultAsync(group => group.Name == groupLogin.Name && 
-                                              group.GroupPassword == groupLogin.GroupPassword);
-            return currentGroup?.Users.ToList();
-        }
-        
         public async Task<User> FindUserAsync(string userName)
         {
-            User user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
+            User user = await DatabaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == userName);
             return user;
         }
         
         public async Task<User> FindUserAsync(string userName, string password)
         {
-            User user = await _databaseContext.Users.FirstOrDefaultAsync(userData =>
+            User user = await DatabaseContext.Users.FirstOrDefaultAsync(userData =>
                 userData.UserName == userName && 
                 userData.Password == password);
             return user;
@@ -54,15 +43,15 @@ namespace MyCloud.DataBase
                     UserName = userName,
                     Password = password
                 };
-                await _databaseContext.Users.AddAsync(user);
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.Users.AddAsync(user);
+                await DatabaseContext.SaveChangesAsync();
                 var personality = new PersonalityData
                 {
                     Id = user.Id,
                     UserName = user.UserName
                 };
-                await _databaseContext.Personality.AddAsync(personality);
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.Personality.AddAsync(personality);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -79,8 +68,8 @@ namespace MyCloud.DataBase
             {
                 User user = await FindUserAsync(userName, password);
                 if (user == null) return false;
-                _databaseContext.Users.Remove(user);
-                await _databaseContext.SaveChangesAsync();
+                DatabaseContext.Users.Remove(user);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -98,7 +87,7 @@ namespace MyCloud.DataBase
                 User user = await FindUserAsync(userName, oldPassword);
                 if (user == null) return false;
                 user.Password = newPassword;
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -120,7 +109,7 @@ namespace MyCloud.DataBase
                 
                 user.UserName = newUserName;
                 personality.UserName = newUserName;
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -137,7 +126,7 @@ namespace MyCloud.DataBase
             {
                 User user = await FindUserAsync(userName);
                 user.IconName = iconName;
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {

@@ -12,7 +12,28 @@
             <div class="exit-button">Назад</div>
         </div>
         <div class="container" id="container">
-            <div class="group-window" id="group-window">
+            
+           <div class="group-window" id="group-window-change">
+               <div class="group-container" id="group-container-change">
+                   <div class="input-container">
+                       <input class="input" id="group-name-old" placeholder="Название группы"/>
+                   </div>
+                   <div class="drop-text" id="drop-text-login-change"></div>
+                   <div class="input-container">
+                       <input class="input" id="group-name-new" placeholder="Новое название группы"/>
+                   </div>
+                   <div class="input-container">
+                       <input class="input" id="group-password-old" placeholder="Пароль группы"/>
+                   </div>
+                   <div class="drop-text" id="drop-text-password-change"></div>
+                   <div class="input-container">
+                       <input class="input" id="group-password-new" placeholder="Новый пароль группы"/>
+                   </div>
+                   <div class="confirm" id="confirm-change">Подтвердить</div>
+               </div>
+           </div>
+            
+           <div class="group-window" id="group-window">
                 <div class="group-container" id="group-container">
                     <div class="drop-text" id="drop-text-login"></div>
                     <div class="input-container">
@@ -22,30 +43,25 @@
                     <div class="input-container">
                         <input class="input" id="group-password" placeholder="Пароль группы"/>
                     </div>
-                    <div class="confirm" id="confirm-change">Подтвердить</div>
+                    <div class="confirm" id="confirm-leave">Подтвердить</div>
                     <div class="confirm" id="confirm-create">Подтвердить</div>
                     <div class="confirm" id="confirm-delete">Подтвердить</div>
                     <div class="confirm" id="confirm-enter">Подтвердить</div>
                 </div>
-            </div>
-            <div class="left-container">
+           </div>
+           <div class="left-container">
                 <p class="header">Участники группы:</p>
                 <div class="users" id="users"></div>
-            </div>
-            <div class="center-container">
+           </div>
+           <div class="center-container">
                 <p class="header">Мои группы:</p>
                 <div class="groups" id="groups"></div>
-            </div>
-            <div class="right-container">
+           </div>
+           <div class="right-container">
                 <div class="groups-info">
                     <div>
                         <p class="groups-info-text">Название:</p>
                         <p class="groups-info-text" id="groups-name-text"></p>
-                    </div>
-                    <div class="vertical-line"></div>
-                    <div>
-                        <p class="groups-info-text">Пароль:</p>
-                        <p class="groups-info-text" id="groups-password-text"></p>
                     </div>
                 </div>
                 <div class="button" id="change-group">Изменить</div>
@@ -54,7 +70,7 @@
                 <hr class="horizontal-line"/>
                 <div class="button" id="enter-group">Вступить</div>
                 <div class="button" id="create-group">Создать</div>
-            </div>
+           </div>
         </div>
         <script src="~/js/sendMessage.js"></script>
         <script src="~/js/Account/myGroups.js"></script>

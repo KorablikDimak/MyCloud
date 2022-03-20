@@ -16,6 +16,17 @@ loginInput.addEventListener("input", () => {
     isNameUsed(loginInput.value).then();
 });
 
+async function isNameUsed(name) {
+    if (name.length > 3) {
+        let response = await sendJsonMessage(siteAddress + "IsGroupNameUsed", 'POST', name)
+        let json = await response.json();
+        if (json === true) {
+            dropTextLogin.classList.add("highlight");
+            dropTextLogin.innerText = "Данное имя занято";
+        }
+    }
+}
+
 let passwordInput = document.getElementById("password-input");
 let dropTextPassword = document.getElementById("drop-text-password");
 passwordInput.addEventListener("input", () => {

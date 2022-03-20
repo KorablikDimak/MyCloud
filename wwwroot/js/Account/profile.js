@@ -44,7 +44,7 @@ changeData.addEventListener("click", () => {
 async function changePersonality() {
     let message = {
         Id: 0,
-        UserName: "",
+        UserName: document.getElementById("username-input").value,
         Surname: document.getElementById("surname-input").value,
         Name: document.getElementById("name-input").value,
     }

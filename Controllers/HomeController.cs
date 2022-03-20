@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyCloud.DataBase.DataRequestBuilder;
 using MyCloud.DataBase.Interfaces;
+using MyCloud.Models.Login;
 using MyCloud.Models.MyFile;
 using MyCloud.Models.User;
 
@@ -217,7 +218,7 @@ namespace MyCloud.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok();
+            return Redirect("~/Account/Login");
         }
         
         [HttpPost("GetCommonFileInfo")]
@@ -311,7 +312,7 @@ namespace MyCloud.Controllers
                 Name = groupName,
                 GroupPassword = groupPassword
             };
-            
+
             Group group = await DatabaseRequest.DatabaseGroupsRequest.FindGroupAsync(groupLogin);
             if (group == null)
             {

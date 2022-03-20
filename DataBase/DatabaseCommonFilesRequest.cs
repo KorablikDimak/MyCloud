@@ -11,17 +11,17 @@ namespace MyCloud.DataBase
 {
     public class DatabaseCommonFilesRequest : IDatabaseFilesRequest, IHaveLogger
     {
-        private readonly DataContext _databaseContext;
+        private DataContext DatabaseContext { get; }
         public ILogger Logger { get; set; }
 
         public DatabaseCommonFilesRequest(DataContext context)
         {
-            _databaseContext = context;
+            DatabaseContext = context;
         }
 
         public IQueryable<MyFileInfo> FindFiles<T>(T criterion)
         {
-            IQueryable<MyFileInfo> files = _databaseContext.Files.Where(file => file.Group == criterion as Group);
+            IQueryable<MyFileInfo> files = DatabaseContext.Files.Where(file => file.Group == criterion as Group);
             return files;
         }
 
@@ -30,8 +30,8 @@ namespace MyCloud.DataBase
             try
             {
                 fileInfo.Group = criterion as Group;
-                await _databaseContext.Files.AddAsync(fileInfo);
-                await _databaseContext.SaveChangesAsync();
+                await DatabaseContext.Files.AddAsync(fileInfo);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -46,12 +46,12 @@ namespace MyCloud.DataBase
         {
             try
             {
-                MyFileInfo fileInfo = await _databaseContext.Files.FirstOrDefaultAsync(file => 
+                MyFileInfo fileInfo = await DatabaseContext.Files.FirstOrDefaultAsync(file => 
                     file.Name == fileName &&
                     file.Group == criterion as Group);
                 if (fileInfo == null) return false;
-                _databaseContext.Files.Remove(fileInfo);
-                await _databaseContext.SaveChangesAsync();
+                DatabaseContext.Files.Remove(fileInfo);
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -66,8 +66,8 @@ namespace MyCloud.DataBase
         {
             try
             {
-                _databaseContext.Files.RemoveRange(FindFiles(criterion as Group));
-                await _databaseContext.SaveChangesAsync();
+                DatabaseContext.Files.RemoveRange(FindFiles(criterion as Group));
+                await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)
             {

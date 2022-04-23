@@ -9,21 +9,27 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabaseFilesRequest : IDatabaseFilesRequest, IHaveLogger
+    public class CommonFilesDatabaseRequest : IFilesRepository, IHaveLogger
     {
         private DataContext DatabaseContext { get; }
         public ILogger Logger { get; set; }
 
-        public DatabaseFilesRequest(DataContext context)
+        public CommonFilesDatabaseRequest(DataContext context)
         {
             DatabaseContext = context;
+        }
+
+        public IQueryable<MyFileInfo> FindFiles<T>(T criterion)
+        {
+            IQueryable<MyFileInfo> files = DatabaseContext.Files.Where(file => file.Group == criterion as Group);
+            return files;
         }
 
         public async Task<bool> AddFileAsync<T>(MyFileInfo fileInfo, T criterion)
         {
             try
             {
-                fileInfo.User = criterion as User;
+                fileInfo.Group = criterion as Group;
                 await DatabaseContext.Files.AddAsync(fileInfo);
                 await DatabaseContext.SaveChangesAsync();
             }
@@ -35,20 +41,14 @@ namespace MyCloud.DataBase
 
             return true;
         }
-        
-        public IQueryable<MyFileInfo> FindFiles<T>(T criterion)
-        {
-            IQueryable<MyFileInfo> files = DatabaseContext.Files.Where(file => file.User == criterion as User);
-            return files;
-        }
-        
+
         public async Task<bool> DeleteFileAsync<T>(string fileName, T criterion)
         {
             try
             {
                 MyFileInfo fileInfo = await DatabaseContext.Files.FirstOrDefaultAsync(file => 
                     file.Name == fileName &&
-                    file.User == criterion as User);
+                    file.Group == criterion as Group);
                 if (fileInfo == null) return false;
                 DatabaseContext.Files.Remove(fileInfo);
                 await DatabaseContext.SaveChangesAsync();
@@ -61,12 +61,12 @@ namespace MyCloud.DataBase
 
             return true;
         }
-        
+
         public async Task<bool> DeleteAllFilesAsync<T>(T criterion)
         {
             try
             {
-                DatabaseContext.Files.RemoveRange(FindFiles(criterion));
+                DatabaseContext.Files.RemoveRange(FindFiles(criterion as Group));
                 await DatabaseContext.SaveChangesAsync();
             }
             catch (Exception e)

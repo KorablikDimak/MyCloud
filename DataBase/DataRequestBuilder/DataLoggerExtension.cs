@@ -13,13 +13,14 @@ namespace MyCloud.DataBase.DataRequestBuilder
             }
         }
 
-        public static void ImplementLogger(this DatabaseRequest databaseRequest, ILogger logger)
+        public static void ImplementLogger(this Repository repository, ILogger logger)
         {
-            (databaseRequest.DatabaseFilesRequest as IHaveLogger).ImplementLogger(logger);
-            (databaseRequest.DatabaseGroupsRequest as IHaveLogger).ImplementLogger(logger);
-            (databaseRequest.DatabasePersonalityRequest as IHaveLogger).ImplementLogger(logger);
-            (databaseRequest.DatabaseUsersRequest as IHaveLogger).ImplementLogger(logger);
-            (databaseRequest.DatabaseCommonFilesRequest as IHaveLogger).ImplementLogger(logger);
+            (repository.FilesRepository as IHaveLogger).ImplementLogger(logger);
+            (repository.GroupsRepository as IHaveLogger).ImplementLogger(logger);
+            (repository.PersonalityRepository as IHaveLogger).ImplementLogger(logger);
+            (repository.UsersRepository as IHaveLogger).ImplementLogger(logger);
+            (repository.CommonFilesRepository as IHaveLogger).ImplementLogger(logger);
+            (repository.RegistrationRepository as IHaveLogger).ImplementLogger(logger);
         }
     }
 }

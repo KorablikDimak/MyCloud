@@ -5,7 +5,7 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase.Interfaces
 {
-    public interface IDatabaseFilesRequest
+    public interface IFilesRepository
     {
         public IQueryable<MyFileInfo> FindFiles<T>(T criterion);
         public Task<bool> AddFileAsync<T>(MyFileInfo fileInfo, T criterion);

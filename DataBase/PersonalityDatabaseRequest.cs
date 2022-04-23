@@ -7,12 +7,12 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabasePersonalityRequest : IDatabasePersonalityRequest, IHaveLogger
+    public class PersonalityDatabaseRequest : IPersonalityRepository, IHaveLogger
     {
         private DataContext DatabaseContext { get; }
         public ILogger Logger { get; set; }
 
-        public DatabasePersonalityRequest(DataContext context)
+        public PersonalityDatabaseRequest(DataContext context)
         {
             DatabaseContext = context;
         }

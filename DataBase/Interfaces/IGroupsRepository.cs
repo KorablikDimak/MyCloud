@@ -5,7 +5,7 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase.Interfaces
 {
-    public interface IDatabaseGroupsRequest
+    public interface IGroupsRepository
     {
         public Task<Group> FindGroupAsync(GroupLogin groupLogin);
         public Task<Group> FindGroupAsync(string groupName);

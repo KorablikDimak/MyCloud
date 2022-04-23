@@ -2,11 +2,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MyCloud
+namespace MyCloud.Security
 {
-    public static class PasswordHash
+    public static class StringHasher
     {
-        public static string HashPassword(this string password)
+        public static string HashString(this string password)
         {
             byte[] passwordBytes = Encoding.Unicode.GetBytes(password);
             

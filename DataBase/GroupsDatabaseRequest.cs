@@ -10,12 +10,12 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase
 {
-    public class DatabaseGroupsRequest : IDatabaseGroupsRequest, IHaveLogger
+    public class GroupsDatabaseRequest : IGroupsRepository, IHaveLogger
     {
         private DataContext DatabaseContext { get; }
         public ILogger Logger { get; set; }
 
-        public DatabaseGroupsRequest(DataContext context)
+        public GroupsDatabaseRequest(DataContext context)
         {
             DatabaseContext = context;
         }

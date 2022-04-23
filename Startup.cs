@@ -31,11 +31,13 @@ namespace MyCloud
                 options.IncludeSubDomains = true;
                 options.MaxAge = TimeSpan.FromDays(60);
             });
+
+            services.AddCors();
             
             string connection = Configuration.GetConnectionString("DefaultConnection");
             
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
-            services.AddDataRequest<DataRequestBuilder>();
+            services.AddDataRequest<RepositoryBuilder>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -59,6 +61,8 @@ namespace MyCloud
             app.UseHttpsRedirection();
             
             app.UseRouting();
+            
+            app.UseCors(builder => builder.AllowAnyOrigin());
             
             app.UseAuthentication();
             

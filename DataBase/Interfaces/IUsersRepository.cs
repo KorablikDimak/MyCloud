@@ -3,7 +3,7 @@ using MyCloud.Models.User;
 
 namespace MyCloud.DataBase.Interfaces
 {
-    public interface IDatabaseUsersRequest
+    public interface IUsersRepository
     {
         public Task<User> FindUserAsync(string userName);
         public Task<User> FindUserAsync(string userName, string password);

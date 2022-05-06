@@ -1,8 +1,7 @@
 # MyCloud
-![ASP.NET](https://img.shields.io/badge/ASP.NET%20Core-5.0-informational)
-![MVC](https://img.shields.io/badge/MVC%20Framework-5.0-informational)
-![Entity](https://img.shields.io/badge/Entity%20Framework-6.0-brightgreen)
-![InfoLog](https://img.shields.io/badge/InfoLog-1.0.0-orange)
+[![](https://img.shields.io/badge/ASP.NET%20Core-5.0-informational)](https://github.com/dotnet/aspnetcore)
+[![](https://img.shields.io/badge/Entity%20Framework-6.0-brightgreen)](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore)
+[![](https://img.shields.io/badge/InfoLog-1.0.0-orange)](https://www.nuget.org/packages/InfoLog)
 ## Description
 Remote file sharing service that allows you to quickly download, save and group files. 
 There is a fairly large api for possible integration with desktop applications and applications on android / ios.
